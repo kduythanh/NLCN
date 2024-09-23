@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tra cứu kết quả</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link href="./css/template.css" rel="stylesheet">
+    </head>
+
+    <body>
+        <!-- Header -->
+        <div class="navigation-bar bg-success text-white d-flex flex-column flex-lg-row position-fixed z-2 w-100">
+            <div class="col-sm-12 col-lg-7 d-flex">
+                <div class="pe-3 align-content-center">
+                    <img src="./image/SGDDT.jpg" alt="logo" style="height: 70px;">
+                </div>
+                <div class="align-content-center">
+                    <a class="nav-link" href="homepage.html">
+                        <p class="mb-0 fs-6">SỞ GIÁO DỤC VÀ ĐÀO TẠO TP CẦN THƠ</p>
+                        <p class="mb-0 fw-bold fs-5">HỆ THỐNG TUYỂN SINH LỚP 10 TRỰC TUYẾN</p>
+                    </a>
+                </div>
+            </div>
+            <div class="col-sm-12 col-lg-5 d-flex">
+                <ul class="navbar-nav flex-row w-100 justify-content-around">
+                    <li class="nav-item align-content-center">
+                        <a class="nav-link text-center fs-5" href="homepage.html">
+                            <i class="bi bi-house-door-fill"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item align-content-center">
+                        <a class="nav-link text-center fs-5" href="searchresult.html">Tra cứu</a>
+                    </li>
+                    <li class="nav-item align-content-center">
+                        <a class="nav-link text-center fs-5" href="admission_info.html">Chỉ tiêu</a>
+                    </li>
+                    <li class="nav-item align-content-center">
+                        <a class="nav-link text-center fs-5" href="information.html">Văn bản</a>
+                    </li>
+                    <li class="nav-item align-content-center">
+                        <a class="nav-link text-center fs-5" href="login.html">Đăng nhập</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="content">
+            <!-- Background -->
+            <div class="full-width-background-2 d-flex">
+                <div class="overlay"></div>
+                <!-- Chức năng tra cứu kết quả -->
+                <div class="container-fluid d-flex justify-content-center">
+                    <form action="" method="POST" id="searchForm">
+                        <div class="card mt-5 bg-light">
+                            <div class="card-header text-center">
+                                <div class="fw-bold fs-3 text-black">
+                                    TRA CỨU KẾT QUẢ TUYỂN SINH LỚP 10 THPT NĂM HỌC 2025-2026
+                                </div>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <div class="row">
+                                    <label for="highschool" class="form-label h-100 col-3 col-form-label align-self-center">Hội đồng
+                                        thi:</label>
+                                    <div class="my-1 dropdown col-9" id="highschool" name="highschool">
+                                        <button
+                                            class="btn btn-light border-1 btn-outline-dark dropdown-toggle w-100 text-start"
+                                            type="button" id="highschoolButton" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            Chọn hội đồng thi
+                                        </button>
+                                        <ul id="highschoolArea" class="dropdown-menu w-100"
+                                            aria-labelledby="highschoolButton">
+                                            <!-- Điền dữ liệu mới vào đây -->
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="typeofsearch" class="form-label h-100 col-3 col-form-label align-self-center">Tra cứu
+                                        theo:</label>
+                                    <div class="my-1 dropdown col-9" id="typeofsearch" name="typeofsearch">
+                                        <button
+                                            class="btn btn-light border-1 btn-outline-dark dropdown-toggle w-100 text-start"
+                                            type="button" id="typeofsearchButton" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            Chọn loại tìm kiếm
+                                        </button>
+                                        <ul class="dropdown-menu w-100" aria-labelledby="typeofsearchButton">
+                                            <li value="1"><a class="dropdown-item" href="#"
+                                                    onclick="updateDropdown('Theo số báo danh')">Theo số báo danh</a>
+                                            </li>
+                                            <li value="2"><a class="dropdown-item" href="#"
+                                                    onclick="updateDropdown('Theo mã học sinh')">Theo mã học sinh</a>
+                                            </li>
+                                            <li value="3"><a class="dropdown-item" href="#"
+                                                    onclick="updateDropdown('Theo họ và tên')">Theo họ và tên</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <label for="searchcontent" class="form-label h-100 col-3 col-form-label align-self-center">Nội dung
+                                        tra cứu:</label>
+                                    <div class="my-1 col-9">
+                                        <input class="form-control border-black focus-ring focus-ring-success" type="text" id="searchcontent" name="searchcontent"
+                                            placeholder="Nhập thông tin tra cứu" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer text-center fw-bold text-black">
+                                <button class="btn btn-success" type="submit">Tìm kiếm</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Footer -->
+            <div class="bg-success text-white d-flex flex-column flex-lg-row">
+                <div class="container">
+                    <div class="text-center fw-bold mt-2">SỞ GIÁO DỤC VÀ ĐÀO TẠO THÀNH PHỐ CẦN THƠ</div>
+                    <div class="text-center">Địa chỉ: Số 39, đường 3 tháng 2, phường Xuân Khánh, quận Ninh Kiều, thành
+                        phố
+                        Cần Thơ</div>
+                    <div class="text-center mb-2">Điện thoại: 0292.3830.753 - Fax: 0292.3830.451 - Email:
+                        vanphong.socantho@moet.edu.vn, sogddt@cantho.gov.vn</div>
+                </div>
+            </div>
+        </div>
+        <!-- Link tới Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+            </script>
+        <script>
+            function adjustPadding() {
+                const header = document.querySelector('.navigation-bar');
+                const headerHeight = header.offsetHeight; // Lấy chiều cao của header
+                document.body.style.paddingTop = headerHeight + 'px'; // Cập nhật padding-top cho body
+            }
+            window.addEventListener('load', adjustPadding); // Gọi hàm khi tải trang
+            window.addEventListener('resize', adjustPadding); // Gọi hàm khi thay đổi kích thước cửa sổ
+        </script>
+        <!-- Cập nhật giá trị của nút Dropdown -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                window.updateDropdown = function (selectedValue) {
+                    const dropdownButton = document.getElementById('typeofsearchButton');
+                    dropdownButton.innerHTML = selectedValue;
+                };
+            });
+        </script>
+        <script>
+            let schools = []; // Mảng để lưu danh sách trường
+
+            // Gửi yêu cầu đến API
+            fetch('/highschoolName')
+                .then(response => response.json())
+                .then(data => {
+                    schools = data; // Lưu danh sách trường vào biến schools
+                    populateDropdown(schools); // Điền dữ liệu vào dropdown
+                })
+                .catch(error => console.error('Lỗi khi hiển thị danh mục trường THPT:', error));
+
+            function populateDropdown(schoolList) {
+                const highschoolArea = document.querySelector('#highschoolArea');
+                highschoolArea.innerHTML = ''; // Xóa nội dung cũ
+
+                schoolList.forEach(school => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'dropdown-item';
+                    listItem.innerHTML = `${school.TEN_THPT}`;
+                    listItem.onclick = () => {
+                        document.getElementById('highschoolButton').innerHTML = `${school.TEN_THPT}`;
+                    };
+                    highschoolArea.appendChild(listItem);
+                });
+            }
+        </script>
+    </body>
+
+</html>

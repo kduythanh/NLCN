@@ -1,0 +1,29 @@
+project-folder/
+├── node_modules/                # Thư mục chứa các package cài đặt
+├── src/
+│   ├── config/                  # Cấu hình ứng dụng
+│   │   ├── db.js                # Cấu hình kết nối cơ sở dữ liệu
+│   │   ├── server.js            # Cấu hình máy chủ Express
+│   ├── controllers/             # Logic xử lý cho các route
+│   │   ├── studentController.js  # Xử lý liên quan đến học sinh
+│   │   ├── applicationController.js # Xử lý liên quan đến nguyện vọng
+│   ├── models/                  # Mô hình dữ liệu (ORM)
+│   │   ├── Student.js           # Mô hình học sinh
+│   │   ├── Application.js        # Mô hình nguyện vọng
+│   ├── routes/                  # Định nghĩa các route
+│   │   ├── studentRoutes.js      # Route liên quan đến học sinh
+│   │   ├── applicationRoutes.js   # Route liên quan đến nguyện vọng
+│   ├── middleware/              # Middleware tùy chỉnh
+│   │   ├── auth.js              # Middleware xác thực (nếu cần)
+│   ├── services/                # Các dịch vụ logic nghiệp vụ
+│   │   ├── studentService.js      # Dịch vụ cho học sinh
+│   │   ├── applicationService.js   # Dịch vụ cho nguyện vọng
+│   ├── validations/             # Xác thực dữ liệu đầu vào
+│   │   ├── studentValidation.js   # Xác thực dữ liệu học sinh
+│   │   ├── applicationValidation.js # Xác thực dữ liệu nguyện vọng
+│   └── utils/                   # Các hàm tiện ích
+│       ├── logger.js            # Logger cho ứng dụng
+├── .env                         # Thông tin cấu hình môi trường
+├── .gitignore                   # Các file và thư mục cần loại bỏ khỏi git
+├── package.json                 # Thông tin về dự án và các package đã cài
+└── README.md                    # Thông tin mô tả dự án

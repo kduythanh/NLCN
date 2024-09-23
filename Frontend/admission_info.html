@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Chỉ tiêu tuyển sinh</title>
+        <!-- Link tới Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link href="./css/template.css" rel="stylesheet">
+    </head>
+
+    <body>
+        <!-- Header -->
+        <div class="navigation-bar bg-success text-white d-flex flex-column flex-lg-row position-fixed z-2 w-100">
+            <div class="col-sm-12 col-lg-7 d-flex">
+                <div class="pe-3 align-content-center">
+                    <img src="./image/SGDDT.jpg" alt="logo" style="height: 70px;">
+                </div>
+                <div class="align-content-center">
+                    <a class="nav-link" href="homepage.html">
+                        <p class="mb-0 fs-6">SỞ GIÁO DỤC VÀ ĐÀO TẠO TP CẦN THƠ</p>
+                        <p class="mb-0 fw-bold fs-5">HỆ THỐNG TUYỂN SINH LỚP 10 TRỰC TUYẾN</p>
+                    </a>
+                </div>
+            </div>
+            <div class="col-sm-12 col-lg-5 d-flex">
+                <ul class="navbar-nav flex-row w-100 justify-content-around">
+                    <li class="nav-item align-content-center">
+                        <a class="nav-link text-center fs-5" href="homepage.html">
+                            <i class="bi bi-house-door-fill"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item align-content-center">
+                        <a class="nav-link text-center fs-5" href="searchresult.html">Tra cứu</a>
+                    </li>
+                    <li class="nav-item align-content-center">
+                        <a class="nav-link text-center fs-5" href="admission_info.html">Chỉ tiêu</a>
+                    </li>
+                    <li class="nav-item align-content-center">
+                        <a class="nav-link text-center fs-5" href="information.html">Văn bản</a>
+                    </li>
+                    <li class="nav-item align-content-center">
+                        <a class="nav-link text-center fs-5" href="login.html">Đăng nhập</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="content w-100">
+            <!-- Số lượng hồ sơ đăng ký -->
+            <div class="container-fluid flex-column justify-content-between my-auto text-black">
+                <div class="display-6 fw-bold text-center content mt-2 mb-2">CẬP NHẬT SỐ LƯỢNG HỒ SƠ ĐĂNG KÝ</div>
+                <!-- <div class="list-group border-1 mb-2">
+                    <a class="list-group-item list-group-item-action" href="./public/QDUB_40_0001.pdf">Quyết định của UBND TP Cần Thơ
+                        phê duyệt Kế hoạch tuyển sinh vào lớp 10</a>
+                    <a class="list-group-item list-group-item-action" href="./public/HuongDanTuyenSinh.pdf">Hướng dẫn tuyển sinh của Sở Giáo dục và
+                        Đào tạo TP Cần Thơ</a>
+                    <a class="list-group-item list-group-item-action" href="./public/QuyDinhTuyenSinh10_2024.pdf">Quy định thi tuyển sinh vào lớp 10 THPT</a>                        
+                    <a class="list-group-item list-group-item-action" href="./public/ChiTieuTuyenSinh2024.pdf">Chỉ tiêu tuyển sinh dự kiến của các
+                        trường THPT</a>
+                    <a class="list-group-item list-group-item-action" href="./public/PhieuDangKy2024.pdf">Phiếu đăng ký tuyển sinh vào lớp 10</a>
+                    <a class="list-group-item list-group-item-action" href="./public/DonPhucKhao.pdf">Đơn xin phúc khảo bài thi</a>
+                </div> -->
+            </div>
+            <div class="container-fluid"></div>
+                <hr class="border-black">
+            </div>
+            <!-- Thông tin các trường THPT -->
+            <div class="container-fluid d-flex flex-column justify-content-between my-auto text-black mb-2">
+                <div class="display-6 fw-bold text-center content mt-2 mb-2">THÔNG TIN CÁC TRƯỜNG THPT</div>
+                <div class="container">
+                    <table class="table table-bordered border-black" id="highschoolTable">
+                        <thead class="text-center table-success text-white border-black align-middle">
+                            <tr>
+                                <th>Mã THPT</th>
+                                <th>Tên trường THPT</th>
+                                <th>Địa chỉ</th>
+                                <th>Chỉ tiêu</th>
+                            </tr>
+                        </thead>
+                        <tbody class="align-middle">
+                            <!-- Dữ liệu sẽ được thêm vào đây -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Footer -->
+            <div class="bg-success text-white d-flex flex-column flex-lg-row">
+                <div class="container">
+                    <div class="text-center fw-bold mt-2">SỞ GIÁO DỤC VÀ ĐÀO TẠO THÀNH PHỐ CẦN THƠ</div>
+                    <div class="text-center">Địa chỉ: Số 39, đường 3 tháng 2, phường Xuân Khánh, quận Ninh Kiều, thành
+                        phố
+                        Cần Thơ</div>
+                    <div class="text-center mb-2">Điện thoại: 0292.3830.753 - Fax: 0292.3830.451 - Email:
+                        vanphong.socantho@moet.edu.vn, sogddt@cantho.gov.vn</div>
+                </div>
+            </div>
+        </div>
+        <!-- Link tới Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+            </script>
+        <script>
+            function adjustPadding() {
+                const header = document.querySelector('.navigation-bar');
+                const headerHeight = header.offsetHeight; // Lấy chiều cao của header
+                document.body.style.paddingTop = headerHeight + 'px'; // Cập nhật padding-top cho body
+            }
+            window.addEventListener('load', adjustPadding); // Gọi hàm khi tải trang
+            window.addEventListener('resize', adjustPadding); // Gọi hàm khi thay đổi kích thước cửa sổ
+        </script>
+        <!-- Hiển thị danh mục trường THPT -->
+        <script>
+            // Gửi yêu cầu đến API
+            fetch('/highschool')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.querySelector('#highschoolTable tbody');
+                    data.forEach(school => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="text-center">${school.MA_THPT}</td>
+                            <td>${school.TEN_THPT}</td>
+                            <td>${school.DIA_CHI}</td>
+                            <td class="text-center">${school.CHI_TIEU}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Lỗi khi hiển thị danh mục trường THPT:', error));
+        </script>
+    </body>
+</html>
