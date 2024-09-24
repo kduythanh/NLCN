@@ -23,7 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../Frontend')));
 app.use(express.static(path.join(__dirname, '../Frontend/roles/admin')));
 app.use(express.static(path.join(__dirname, '../Frontend/roles/hdts')));
-app.use(express.static(path.join(__dirname, '../Frontend/roles/student')));
+app.use(express.static(path.join(__dirname, '../Frontend/roles/hocsinh')));
 app.use(express.static(path.join(__dirname, '../Frontend/roles/thcs')));
 app.use(express.static(path.join(__dirname, '../Frontend/roles/thpt')));
 // Cấu hình express-session
@@ -133,6 +133,7 @@ app.get('/api/admin', (req, res) => {
         res.send('Bạn không có quyền truy cập');
     }
 });
+// Đổi mật khẩu của account Admin
 app.put('/admin', (req, res) => {
     const { currentPassword, newPassword, confirmNewPassword } = req.body;
     // Kiểm tra mật khẩu xác nhận
@@ -160,14 +161,50 @@ app.put('/admin', (req, res) => {
         });
     });
 })
+// Xử lý đăng nhập của sở GDĐT (Hội đồng tuyển sinh)
 app.get('/sgddt', (req, res) => {
     if (req.session.tenTaiKhoan && req.session.doiTuong === 'sgddt') {
-        res.send('Chào mừng Hội đồng tuyển sinh TP Cần Thơ');
+        res.sendFile(path.join(__dirname, '../Frontend/roles/hdts/hdts.html'));
     } else {
         res.send('Bạn không có quyền truy cập');
     }
 });
-
+app.get('/api/hdts', (req, res) => {
+    if (req.session.tenTaiKhoan && req.session.doiTuong === 'sgddt') {
+        res.json({ tenTaiKhoan: req.session.tenTaiKhoan, doiTuong: req.session.doiTuong });
+    } else {
+        res.send('Bạn không có quyền truy cập');
+    }    
+})
+// Đổi mật khẩu của account HĐTS
+app.put('/hdts', (req, res) => {
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+    // Kiểm tra mật khẩu xác nhận
+    if (newPassword !== confirmNewPassword) {
+        return res.status(400).send('Mật khẩu xác nhận không khớp.');
+    }
+    const tenTaiKhoan = req.session.tenTaiKhoan;
+    // Kiểm tra mật khẩu hiện tại (có thể cần truy vấn để xác minh)
+    db.query('SELECT MAT_KHAU FROM TAI_KHOAN WHERE TEN_TAI_KHOAN = "sgddt"', (err, results) => {
+        if (err || results.length === 0) {
+            console.error(err);
+            return res.status(500).send('Có lỗi xảy ra khi kiểm tra mật khẩu hiện tại.');
+        }
+        const currentAdminPassword = results[0].MAT_KHAU;
+        // Kiểm tra mật khẩu hiện tại (so sánh với mật khẩu từ cơ sở dữ liệu)
+        if (currentPassword !== currentAdminPassword) {
+            return res.status(401).send('Mật khẩu hiện tại không chính xác.');
+        }
+        // Cập nhật mật khẩu mới
+        db.query('UPDATE TAI_KHOAN SET MAT_KHAU = ? WHERE TEN_TAI_KHOAN = "sgddt"', (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Có lỗi xảy ra khi cập nhật mật khẩu.');
+            }
+            res.sendStatus(200); // Trả về thành công
+        });
+    });
+})
 app.get('/thcs', (req, res) => {
     if (req.session.tenTaiKhoan && req.session.doiTuong === 'thcs') {
         res.send('Chào mừng Trường ' + req.session.tenTruong + ' có mã ' + req.session.maTruong);
@@ -183,13 +220,50 @@ app.get('/thpt', (req, res) => {
         res.send('Bạn không có quyền truy cập');
     }
 });
+// Xử lý đăng nhập của học sinh
 app.get('/hocsinh', (req, res) => {
     if (req.session.tenTaiKhoan && req.session.doiTuong === 'hocsinh') {
-        res.send('Chào mừng Học sinh ' + req.session.tenHocSinh + ' có Mã định danh ' + req.session.maHocSinh);
+        res.sendFile(path.join(__dirname, '../Frontend/roles/hocsinh/hocsinh.html'));
     } else {
         res.send('Bạn không có quyền truy cập');
     }
 });
+app.get('/api/hocsinh', (req, res) => {
+    if (req.session.tenTaiKhoan && req.session.doiTuong === 'hocsinh') {
+        res.json({ tenTaiKhoan: req.session.tenTaiKhoan, doiTuong: req.session.doiTuong, tenHocSinh: req.session.tenHocSinh });
+    } else {
+        res.send('Bạn không có quyền truy cập');
+    }
+});
+// Đổi mật khẩu của account Học sinh
+app.put('/hocsinh', (req, res) => {
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+    // Kiểm tra mật khẩu xác nhận
+    if (newPassword !== confirmNewPassword) {
+        return res.status(400).send('Mật khẩu xác nhận không khớp.');
+    }
+    const tenTaiKhoan = req.session.tenTaiKhoan;
+    // Kiểm tra mật khẩu hiện tại (có thể cần truy vấn để xác minh)
+    db.query('SELECT MAT_KHAU FROM TAI_KHOAN WHERE TEN_TAI_KHOAN = ?', [tenTaiKhoan], (err, results) => {
+        if (err || results.length === 0) {
+            console.error(err);
+            return res.status(500).send('Có lỗi xảy ra khi kiểm tra mật khẩu hiện tại.');
+        }
+        const currentAdminPassword = results[0].MAT_KHAU;
+        // Kiểm tra mật khẩu hiện tại (so sánh với mật khẩu từ cơ sở dữ liệu)
+        if (currentPassword !== currentAdminPassword) {
+            return res.status(401).send('Mật khẩu hiện tại không chính xác.');
+        }
+        // Cập nhật mật khẩu mới
+        db.query('UPDATE TAI_KHOAN SET MAT_KHAU = ? WHERE TEN_TAI_KHOAN = ?', [newPassword, tenTaiKhoan], (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Có lỗi xảy ra khi cập nhật mật khẩu.');
+            }
+            res.sendStatus(200); // Trả về thành công
+        });
+    });
+})
 // Xử lý logout
 app.get('/logout', (req, res) => {
     req.session.destroy(err => {
