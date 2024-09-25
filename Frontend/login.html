@@ -42,7 +42,7 @@
                         <a class="nav-link text-center fs-5" href="information.html">Văn bản</a>
                     </li>
                     <li class="nav-item align-content-center">
-                        <a class="nav-link text-center fs-5" href="login.html">Đăng nhập</a>
+                        <a class="nav-link text-center fs-5 fw-bold" href="login.html">Đăng nhập</a>
                     </li>
                 </ul>
             </div>
@@ -53,7 +53,7 @@
                 <div class="overlay"></div>
                 <!-- Chức năng đăng nhập -->
                 <div class="container-fluid d-flex justify-content-center">
-                    <form action="/login" method="POST" id="loginForm">
+                    <form id="loginForm">
                         <div class="card mt-5 bg-light">
                             <div class="card-header text-center">
                                 <div class="fw-bold fs-3 text-black">
@@ -110,6 +110,36 @@
             }
             window.addEventListener('load', adjustPadding); // Gọi hàm khi tải trang
             window.addEventListener('resize', adjustPadding); // Gọi hàm khi thay đổi kích thước cửa sổ
+            // Xử lý thao tác đăng nhập
+            document.getElementById('loginForm').onsubmit = function(event) {
+            event.preventDefault(); // Ngăn chặn hành động gửi form mặc định
+            const formData = new FormData(this);
+            const data = {
+                username: formData.get('username'),
+                password: formData.get('password')
+            };
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(error => {
+                        throw new Error(error.message);
+                    });
+                }
+                // Nếu đăng nhập thành công, chuyển hướng theo role
+                window.location.href = response.url; // Chuyển đến URL được trả về từ server
+            })
+            .catch(error => {
+                // Hiển thị dialog lỗi
+                alert(error.message); // Hoặc có thể dùng modal để hiển thị
+            });
+        };
         </script>
     </body>
 

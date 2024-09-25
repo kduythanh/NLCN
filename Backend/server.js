@@ -9,6 +9,7 @@ const db = require('./config/db');
 // // const bcrypt = require('bcryptjs');
 // const bodyParser = require('body-parser');
 const session = require('express-session');
+const { fail } = require('assert');
 
 const app = express();
 const port = 3000;
@@ -33,7 +34,6 @@ app.use(session({
     saveUninitialized: true,
     cookie: {
         secure: false,
-        maxAge: 30 * 60 * 1000
     }
 }));
 
@@ -110,10 +110,10 @@ app.post('/login', (req, res) => {
                         break;
                 }
             } else {
-                res.status(401).send('Sai mật khẩu');
+                res.status(401).json({ status: fail, message: 'Mật khẩu nhập vào không chính xác, vui lòng nhập lại!' });
             }
         } else {
-            res.status(401).send('Tài khoản không tồn tại');
+            res.status(401).json({ status: fail, message: 'Tài khoản không tồn tại!' });
         }
     });
 });
@@ -190,9 +190,9 @@ app.put('/hdts', (req, res) => {
             console.error(err);
             return res.status(500).send('Có lỗi xảy ra khi kiểm tra mật khẩu hiện tại.');
         }
-        const currentAdminPassword = results[0].MAT_KHAU;
+        const currentHDTSPassword = results[0].MAT_KHAU;
         // Kiểm tra mật khẩu hiện tại (so sánh với mật khẩu từ cơ sở dữ liệu)
-        if (currentPassword !== currentAdminPassword) {
+        if (currentPassword !== currentHDTSPassword) {
             return res.status(401).send('Mật khẩu hiện tại không chính xác.');
         }
         // Cập nhật mật khẩu mới
@@ -205,21 +205,91 @@ app.put('/hdts', (req, res) => {
         });
     });
 })
+// Xử lý đăng nhập account trường THCS
 app.get('/thcs', (req, res) => {
     if (req.session.tenTaiKhoan && req.session.doiTuong === 'thcs') {
-        res.send('Chào mừng Trường ' + req.session.tenTruong + ' có mã ' + req.session.maTruong);
+        res.sendFile(path.join(__dirname, '../Frontend/roles/thcs/thcs.html'));
     } else {
         res.send('Bạn không có quyền truy cập');
     }
 });
-
+app.get('/api/thcs', (req, res) => {
+    if (req.session.tenTaiKhoan && req.session.doiTuong === 'thcs') {
+        res.json({ tenTaiKhoan: req.session.tenTaiKhoan, doiTuong: req.session.doiTuong, tenTruong: req.session.tenTruong });
+    } else {
+        res.send('Bạn không có quyền truy cập');
+    }    
+})
+app.put('/thcs', (req, res) => {
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+    // Kiểm tra mật khẩu xác nhận
+    if (newPassword !== confirmNewPassword) {
+        return res.status(400).send('Mật khẩu xác nhận không khớp.');
+    }
+    const tenTaiKhoan = req.session.tenTaiKhoan;
+    // Kiểm tra mật khẩu hiện tại (có thể cần truy vấn để xác minh)
+    db.query('SELECT MAT_KHAU FROM TAI_KHOAN WHERE TEN_TAI_KHOAN = ?', [tenTaiKhoan], (err, results) => {
+        if (err || results.length === 0) {
+            console.error(err);
+            return res.status(500).send('Có lỗi xảy ra khi kiểm tra mật khẩu hiện tại.');
+        }
+        const currentTHCSPassword = results[0].MAT_KHAU;
+        // Kiểm tra mật khẩu hiện tại (so sánh với mật khẩu từ cơ sở dữ liệu)
+        if (currentPassword !== currentTHCSPassword) {
+            return res.status(401).send('Mật khẩu hiện tại không chính xác.');
+        }
+        // Cập nhật mật khẩu mới
+        db.query('UPDATE TAI_KHOAN SET MAT_KHAU = ? WHERE TEN_TAI_KHOAN = ?', [newPassword, tenTaiKhoan], (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Có lỗi xảy ra khi cập nhật mật khẩu.');
+            }
+            res.sendStatus(200); // Trả về thành công
+        });
+    });
+})
 app.get('/thpt', (req, res) => {
     if (req.session.tenTaiKhoan && req.session.doiTuong === 'thpt') {
-        res.send('Chào mừng Trường ' + req.session.tenTruong + ' có mã ' + req.session.maTruong);
+        res.sendFile(path.join(__dirname, '../Frontend/roles/thpt/thpt.html'));
     } else {
         res.send('Bạn không có quyền truy cập');
     }
 });
+app.get('/api/thpt', (req, res) => {
+    if (req.session.tenTaiKhoan && req.session.doiTuong === 'thpt') {
+        res.json({ tenTaiKhoan: req.session.tenTaiKhoan, doiTuong: req.session.doiTuong, tenTruong: req.session.tenTruong });
+    } else {
+        res.send('Bạn không có quyền truy cập');
+    }    
+})
+app.put('/thpt', (req, res) => {
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+    // Kiểm tra mật khẩu xác nhận
+    if (newPassword !== confirmNewPassword) {
+        return res.status(400).send('Mật khẩu xác nhận không khớp.');
+    }
+    const tenTaiKhoan = req.session.tenTaiKhoan;
+    // Kiểm tra mật khẩu hiện tại (có thể cần truy vấn để xác minh)
+    db.query('SELECT MAT_KHAU FROM TAI_KHOAN WHERE TEN_TAI_KHOAN = ?', [tenTaiKhoan], (err, results) => {
+        if (err || results.length === 0) {
+            console.error(err);
+            return res.status(500).send('Có lỗi xảy ra khi kiểm tra mật khẩu hiện tại.');
+        }
+        const currentTHPTassword = results[0].MAT_KHAU;
+        // Kiểm tra mật khẩu hiện tại (so sánh với mật khẩu từ cơ sở dữ liệu)
+        if (currentPassword !== currentTHPTPassword) {
+            return res.status(401).send('Mật khẩu hiện tại không chính xác.');
+        }
+        // Cập nhật mật khẩu mới
+        db.query('UPDATE TAI_KHOAN SET MAT_KHAU = ? WHERE TEN_TAI_KHOAN = ?', [newPassword, tenTaiKhoan], (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Có lỗi xảy ra khi cập nhật mật khẩu.');
+            }
+            res.sendStatus(200); // Trả về thành công
+        });
+    });
+})
 // Xử lý đăng nhập của học sinh
 app.get('/hocsinh', (req, res) => {
     if (req.session.tenTaiKhoan && req.session.doiTuong === 'hocsinh') {
@@ -249,9 +319,9 @@ app.put('/hocsinh', (req, res) => {
             console.error(err);
             return res.status(500).send('Có lỗi xảy ra khi kiểm tra mật khẩu hiện tại.');
         }
-        const currentAdminPassword = results[0].MAT_KHAU;
+        const currentHocsinhPassword = results[0].MAT_KHAU;
         // Kiểm tra mật khẩu hiện tại (so sánh với mật khẩu từ cơ sở dữ liệu)
-        if (currentPassword !== currentAdminPassword) {
+        if (currentPassword !== currentHocsinhPassword) {
             return res.status(401).send('Mật khẩu hiện tại không chính xác.');
         }
         // Cập nhật mật khẩu mới
@@ -317,11 +387,20 @@ app.delete('/account/{accountName}', (req, res) => {
 })
 // Middleware để sử dụng API routes
 app.use('/api', apiRoutes);
-
+// Kiểm tra tồn tại session trong 1 trang
+app.get('/api/check-session', (req, res) => {
+    if (req.session && req.session.tenTaiKhoan) {
+        // Nếu có session đang hoạt động
+        res.status(200).send('Session còn hoạt động');
+    } else {
+        // Nếu không có session
+        res.status(401).send('Không có session');
+    }
+});
 // Thêm Swagger
 swaggerDocs(app);
 
 // Khởi động server
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
