@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sửa hồ sơ học sinh</title>
+        <!-- Link tới Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link href="../../css/template.css" rel="stylesheet">
+        <script>
+            async function checkSession() {
+                try {
+                    const response = await fetch('/api/check-session'); // Endpoint kiểm tra session
+                    if (!response.ok) {
+                        // Nếu không có session, chuyển hướng về trang chủ
+                        window.location.href = '/'; // Địa chỉ trang chủ
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi kiểm tra session:', error);
+                    window.location.href = '/'; // Chuyển hướng nếu có lỗi
+                }
+            }
+            // Kiểm tra session khi trang được tải
+            window.onload = checkSession;
+        </script>
+    </head>
+
+    <body>
+        <!-- Header -->
+        <div class="navigation-bar bg-success text-white d-flex flex-column flex-lg-row position-fixed z-2 w-100">
+            <div class="col-sm-12 col-lg-7 d-flex">
+                <div class="pe-3 align-content-center">
+                    <img src="../../image/SGDDT.jpg" alt="logo" style="height: 70px;">
+                </div>
+                <div class="align-content-center">
+                    <a class="nav-link" href="thcs.html">
+                        <p class="mb-0 fs-6">SỞ GIÁO DỤC VÀ ĐÀO TẠO TP CẦN THƠ</p>
+                        <p class="mb-0 fw-bold fs-5">HỆ THỐNG TUYỂN SINH LỚP 10 TRỰC TUYẾN</p>
+                    </a>
+                </div>
+            </div>
+            <div class="col-sm-12 col-lg-5 d-flex">
+                <ul class="navbar-nav flex-row w-100 justify-content-end">
+                    <li class="nav-item align-content-center px-3">
+                        <a class="nav-link text-center fs-5" href="thcs.html">
+                            <i class="bi bi-house-door-fill"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item align-content-center px-3">
+                        <div>
+                            <a id="greeting" class="nav-link text-end py-0 fw-bold" href="#"></a>
+                            <div class="d-flex flex-row justify-content-end">
+                                <a class="nav-link text-end py-0 fs-5" href="changePasswordTHCS.html">Đổi mật khẩu</a>
+                                <span class="fs-5"> / </span>
+                                <a class="nav-link text-end py-0 fs-5" href="#" onclick="confirmLogout(event)">Đăng
+                                    xuất</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="content">
+            <!-- Quản lý tài khoản -->
+            <div class="container flex-column justify-content-between my-auto text-black ">
+                <div class="display-6 fw-bold text-center content mt-2 mb-2">SỬA THÔNG TIN HỒ SƠ</div>
+                <form>
+                    <div class="mb-3 row">
+                        <label for="MSHS" class="col-sm-3 col-form-label fw-bold">Mã số học sinh<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="MSHS" name="MSHS" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="HoTenHS" class="col-sm-3 col-form-label fw-bold">Họ và tên học sinh<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="HoTenHS" name="HoTenHS" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="gender" class="col-sm-3 col-form-label fw-bold">Giới tính<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <select class="form-select" id="gender" required>
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="DanToc" class="col-sm-3 col-form-label fw-bold">Dân tộc<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <select class="form-select" id="DanToc" name="DanToc" required>
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="NgaySinh" class="col-sm-3 col-form-label fw-bold">Ngày sinh<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="date" class="form-control" id="NgaySinh" name="NgaySinh" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="NoiSinh" class="col-sm-3 col-form-label fw-bold">Nơi sinh<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="NoiSinh" name="NoiSinh" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="HKTT" class="col-sm-3 col-form-label fw-bold">Hộ khẩu thường trú</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="HKTT" name="HKTT" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="COHN" class="col-sm-3 col-form-label fw-bold">Chỗ ở hiện nay</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="COHN" name="COHN" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label fw-bold">Học lực và Hạnh kiểm<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <span class="mb-2 fw-bold">Lớp 6: </span>
+                            <label for="HocLuc6" class="form-label">Học lực</label>
+                            <select class="form-select d-inline-block w-auto" id="HocLuc6">
+                                <option value="Giỏi">Giỏi</option>
+                                <option value="Khá">Khá</option>
+                                <option value="Trung bình">Trung bình</option>
+                            </select>
+                            <label for="HanhKiem6" class="form-label">Hạnh kiểm</label>
+                            <select class="form-select d-inline-block w-auto" id="HanhKiem6">
+                                <option value="Tốt">Tốt</option>
+                                <option value="Khá">Khá</option>
+                                <option value="Trung bình">Trung bình</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <div class="col-sm-9 offset-sm-3">
+                            <span class="mb-2 fw-bold">Lớp 7: </span>
+                            <label for="HocLuc7" class="form-label">Học lực</label>
+                            <select class="form-select d-inline-block w-auto" id="HocLuc7">
+                                <option value="Giỏi">Giỏi</option>
+                                <option value="Khá">Khá</option>
+                                <option value="Trung bình">Trung bình</option>
+                            </select>
+                            <label for="HanhKiem7" class="form-label">Hạnh kiểm</label>
+                            <select class="form-select d-inline-block w-auto" id="HanhKiem7">
+                                <option value="Tốt">Tốt</option>
+                                <option value="Khá">Khá</option>
+                                <option value="Trung bình">Trung bình</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <div class="col-sm-9 offset-sm-3">
+                            <span class="mb-2 fw-bold">Lớp 8: </span>
+                            <label for="HocLuc8" class="form-label">Học lực</label>
+                            <select class="form-select d-inline-block w-auto" id="HocLuc8">
+                                <option value="Giỏi">Giỏi</option>
+                                <option value="Khá">Khá</option>
+                                <option value="Trung bình">Trung bình</option>
+                            </select>
+                            <label for="HanhKiem8" class="form-label">Hạnh kiểm</label>
+                            <select class="form-select d-inline-block w-auto" id="HanhKiem8">
+                                <option value="Tốt">Tốt</option>
+                                <option value="Khá">Khá</option>
+                                <option value="Trung bình">Trung bình</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <div class="col-sm-9 offset-sm-3">
+                            <span class="mb-2 fw-bold">Lớp 9: </span>
+                            <label for="HocLuc9" class="form-label">Học lực</label>
+                            <select class="form-select d-inline-block w-auto" id="HocLuc9">
+                                <option value="Giỏi">Giỏi</option>
+                                <option value="Khá">Khá</option>
+                                <option value="Trung bình">Trung bình</option>
+                            </select>
+                            <label for="HanhKiem9" class="form-label">Hạnh kiểm</label>
+                            <select class="form-select d-inline-block w-auto" id="HanhKiem9">
+                                <option value="Tốt">Tốt</option>
+                                <option value="Khá">Khá</option>
+                                <option value="Trung bình">Trung bình</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="NamTotNghiep" class="col-sm-3 col-form-label fw-bold">Năm tốt nghiệp THCS<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" id="NamTotNghiep" name="NamTotNghiep" value="2025"
+                                required>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="NgoaiNgu" class="col-sm-3 col-form-label fw-bold">Ngoại ngữ đang học<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <select class="form-select" id="NgoaiNgu" required>
+                                <option value="Tiếng Anh">Tiếng Anh</option>
+                                <option value="Tiếng Pháp">Tiếng Pháp</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="NgoaiNguDuThi" class="col-sm-3 col-form-label fw-bold">Ngoại ngữ dự thi<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <select class="form-select" id="NgoaiNguDuThi" required>
+                                <option value="Tiếng Anh">Tiếng Anh</option>
+                                <option value="Tiếng Pháp">Tiếng Pháp</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="DienThoai" class="col-sm-3 col-form-label fw-bold">Số điện thoại</label>
+                        <div class="col-sm-9">
+                            <input type="tel" class="form-control" id="DienThoai" name="DienThoai" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="DTUuTien" class="col-sm-3 col-form-label fw-bold">Đối tượng ưu tiên<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <select class="form-select" id="DTUuTien">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="DTKhuyenKhich" class="col-sm-3 col-form-label fw-bold">Đối tượng khuyến khích<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <select class="form-select" id="DTKhuyenKhich">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="reset" class="btn btn-warning mx-2">Khôi phục</button>
+                        <button type="submit" class="btn btn-success mx-2" onclick="updateStudent(event)">Sửa hồ
+                            sơ</button>
+                    </div>
+                </form>
+                <div id="student-info"></div>
+            </div>
+            <!-- Footer -->
+            <div class="bg-success text-white d-flex flex-column flex-lg-row">
+                <div class="container">
+                    <div class="text-center fw-bold mt-2">SỞ GIÁO DỤC VÀ ĐÀO TẠO THÀNH PHỐ CẦN THƠ</div>
+                    <div class="text-center">Địa chỉ: Số 39, đường 3 tháng 2, phường Xuân Khánh, quận Ninh Kiều, thành
+                        phố
+                        Cần Thơ</div>
+                    <div class="text-center mb-2">Điện thoại: 0292.3830.753 - Fax: 0292.3830.451 - Email:
+                        vanphong.socantho@moet.edu.vn, sogddt@cantho.gov.vn</div>
+                </div>
+            </div>
+        </div>
+        <!-- Link tới Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+            </script>
+        <script>
+            // Điều chỉnh thanh header
+            function adjustPadding() {
+                const header = document.querySelector('.navigation-bar');
+                const headerHeight = header.offsetHeight; // Lấy chiều cao của header
+                document.body.style.paddingTop = headerHeight + 'px'; // Cập nhật padding-top cho body
+            }
+            window.addEventListener('load', adjustPadding); // Gọi hàm khi tải trang
+            window.addEventListener('resize', adjustPadding); // Gọi hàm khi thay đổi kích thước cửa sổ
+            // Xử lý thêm họ tên học sinh vào chỗ Xin chào
+            fetch('/api/thcs')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Bạn chưa đăng nhập.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('greeting').innerText = 'Xin chào, ' + data.tenTruong.toUpperCase() + '!';
+                })
+                .catch(error => {
+                    console.error(error);
+                    if (error.message === 'Bạn chưa đăng nhập.') {
+                        window.location.href = "/";
+                    }
+                });
+
+            // Xử lý kiểm tra trước khi logout
+            function confirmLogout(event) {
+                event.preventDefault(); // Ngăn chặn hành động mặc định của liên kết
+                const confirmation = confirm("Bạn có chắc chắn muốn đăng xuất không?");
+                if (confirmation) {
+                    window.location.href = '/logout'; // Nếu người dùng xác nhận, chuyển hướng đến route logout
+                }
+            }
+            // Xử lý lấy tên các dân tộc
+            fetch('/dantoc')
+                .then(response => response.json())
+                .then(data => {
+                    const danTocSelect = document.getElementById('DanToc');
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.TEN_DAN_TOC; // hoặc ID nếu cần
+                        option.textContent = item.TEN_DAN_TOC;
+
+                        // Kiểm tra xem dân tộc có phải là "Kinh" không để đặt giá trị mặc định
+                        if (item.TEN_DAN_TOC === 'Kinh') {
+                            option.selected = true; // Đặt "Kinh" là giá trị mặc định
+                        }
+                        danTocSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+            // Xử lý lấy các đối tượng ưu tiên
+            fetch('/dtuutien')
+                .then(response => response.json())
+                .then(data => {
+                    const dtUuTienSelect = document.getElementById('DTUuTien');
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.TEN_DT_UU_TIEN; // hoặc ID nếu cần
+                        option.textContent = item.TEN_DT_UU_TIEN;
+
+                        // Kiểm tra xem dân tộc có phải là "Kinh" không để đặt giá trị mặc định
+                        if (item.TEN_DT_UU_TIEN === 'Không thuộc đối tượng ưu tiên') {
+                            option.selected = true; // Đặt "Kinh" là giá trị mặc định
+                        }
+                        dtUuTienSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+            // Xử lý lấy các đối tượng khuyến khích
+            fetch('/dtkhuyenkhich')
+                .then(response => response.json())
+                .then(data => {
+                    const dtKhuyenKhichSelect = document.getElementById('DTKhuyenKhich');
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.TEN_DT_KHUYEN_KHICH; // hoặc ID nếu cần
+                        option.textContent = item.TEN_DT_KHUYEN_KHICH;
+
+                        // Kiểm tra xem dân tộc có phải là "Kinh" không để đặt giá trị mặc định
+                        if (item.TEN_DT_KHUYEN_KHICH === 'Không thuộc đối tượng khuyến khích') {
+                            option.selected = true; // Đặt "Kinh" là giá trị mặc định
+                        }
+                        dtKhuyenKhichSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching data:', error));
+            // Xử lý hiển thị danh sách hồ sơ của học sinh tại trường THCS
+            const studentId = new URLSearchParams(window.location.search).get('id');
+
+            fetch(`/thcs/hocsinh/${studentId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Có lỗi xảy ra trong quá trình tải hồ sơ học sinh');
+                    }
+                    return response.json();
+                })
+                .then(student => {
+                    document.getElementById('MSHS').value = student.MA_HOC_SINH;
+                    document.getElementById('MSHS').readOnly = true;
+                    document.getElementById('HoTenHS').value = student.HO_TEN_HOC_SINH;
+                    document.getElementById('gender').value = student.GIOI_TINH;
+                    document.getElementById('DanToc').value = student.TEN_DAN_TOC; // Cần đảm bảo rằng danh sách dân tộc đã được tải
+                    const ngaySinh = new Date(student.NGAY_SINH); // Chuyển đổi chuỗi thành đối tượng Date
+
+                    const day = String(ngaySinh.getDate()).padStart(2, '0'); // Lấy ngày và đảm bảo có 2 chữ số
+                    const month = String(ngaySinh.getMonth() + 1).padStart(2, '0'); // Lấy tháng (thêm 1 vì tháng bắt đầu từ 0)
+                    const year = ngaySinh.getFullYear(); // Lấy năm
+
+                    const formattedDate = `${year}-${month}-${day}`; // Định dạng lại
+
+                    document.getElementById('NgaySinh').value = formattedDate; // Gán giá trị vào input
+                    document.getElementById('NoiSinh').value = student.NOI_SINH;
+                    document.getElementById('HKTT').value = student.HO_KHAU_THUONG_TRU;
+                    document.getElementById('COHN').value = student.CHO_O_HIEN_NAY;
+                    document.getElementById('NamTotNghiep').value = student.NAM_TOT_NGHIEP_THCS;
+                    document.getElementById('NgoaiNgu').value = student.NGOAI_NGU_DANG_HOC;
+                    document.getElementById('NgoaiNguDuThi').value = student.NGOAI_NGU_DU_THI;
+                    document.getElementById('DienThoai').value = student.SO_DIEN_THOAI;
+                    document.getElementById('DTUuTien').value = student.TEN_DT_UU_TIEN; // Cần đảm bảo rằng danh sách đối tượng ưu tiên đã được tải
+                    document.getElementById('DTKhuyenKhich').value = student.TEN_DT_KHUYEN_KHICH; // Cần đảm bảo rằng danh sách đối tượng khuyến khích đã được tải
+                })
+                .catch(error => {
+                    console.error('Có lỗi xảy ra khi tải hồ sơ học sinh:', error);
+                });
+            const khoiLop = [6, 7, 8, 9];
+            khoiLop.forEach(khoi => {
+                fetch(`/thcs/hocsinh/${studentId}/kqht/${khoi}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Có lỗi xảy ra trong quá trình tải hồ sơ học sinh lớp ${khoi}`);
+                        }
+                        return response.json();
+                    })
+                    .then(student => {
+                        document.getElementById(`HocLuc${khoi}`).value = student.HOC_LUC;
+                        document.getElementById(`HanhKiem${khoi}`).value = student.HANH_KIEM;
+                    })
+                    .catch(error => {
+                        console.error(`Có lỗi xảy ra khi tải hồ sơ học sinh lớp ${khoi}:`, error);
+                    });
+            });
+            // Cập nhật hồ sơ học sinh
+            function updateStudent(event) {
+                event.preventDefault();
+                // Confirmation dialog
+                const confirmRegistration = confirm("Bạn có chắc chắn muốn cập nhật hồ sơ này không?");
+                if (!confirmRegistration) {
+                    return; // Stop the function if the user cancels
+                }
+                const formData = {
+                    MSHS: document.getElementById('MSHS').value,
+                    HoTenHS: document.getElementById('HoTenHS').value,
+                    gender: document.getElementById('gender').value,
+                    NgaySinh: document.getElementById('NgaySinh').value,
+                    NoiSinh: document.getElementById('NoiSinh').value,
+                    HKTT: document.getElementById('HKTT').value,
+                    COHN: document.getElementById('COHN').value,
+                    NamTotNghiep: document.getElementById('NamTotNghiep').value,
+                    NgoaiNgu: document.getElementById('NgoaiNgu').value,
+                    NgoaiNguDuThi: document.getElementById('NgoaiNguDuThi').value,
+                    DienThoai: document.getElementById('DienThoai').value,
+                    DanToc: document.getElementById('DanToc').value,
+                    DTUuTien: document.getElementById('DTUuTien').value,
+                    DTKhuyenKhich: document.getElementById('DTKhuyenKhich').value
+                };
+                fetch(`/thcs/hocsinh/${studentId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => {
+                        console.log('Phản hồi từ server:', response); // Thêm dòng này
+                        if (!response.ok) {
+                            throw new Error('Có lỗi xảy ra');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Thêm kết quả học tập cho các lớp 6, 7, 8, 9
+                        const lopList = [6, 7, 8, 9];
+                        const promises = lopList.map(lop => {
+                            const KQHT = {
+                                MSHS: document.getElementById('MSHS').value,
+                                HL: document.getElementById(`HocLuc${lop}`).value,
+                                HK: document.getElementById(`HanhKiem${lop}`).value
+                            };
+
+                            return fetch(`/thcs/hocsinh/${studentId}/kqht/${lop}`, {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(KQHT)
+                            });
+                        });
+                        return Promise.all(promises);
+                    })
+                    .then(() => {
+                        alert('Cập nhật hồ sơ thành công!');
+                        window.location.href = 'thcs.html';
+                    })
+                    .catch(error => {
+                        console.error('Lỗi:', error);
+                    });
+            }
+        </script>
+    </body>
+
+</html>

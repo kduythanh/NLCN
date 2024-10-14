@@ -55,7 +55,8 @@
                             <div class="d-flex flex-row justify-content-end">
                                 <a class="nav-link text-end py-0 fs-5" href="changePasswordTHCS.html">Đổi mật khẩu</a>
                                 <span class="fs-5"> / </span>
-                                <a class="nav-link text-end py-0 fs-5" href="#" onclick="confirmLogout(event)">Đăng xuất</a>
+                                <a class="nav-link text-end py-0 fs-5" href="#" onclick="confirmLogout(event)">Đăng
+                                    xuất</a>
                             </div>
                         </div>
                     </li>
@@ -65,8 +66,24 @@
         <div class="content">
             <!-- Quản lý tài khoản -->
             <div class="container flex-column justify-content-between my-auto text-black">
-                <div class="display-6 fw-bold text-center content mt-2 mb-2">THÔNG TIN HỒ SƠ CỦA TRƯỜNG</div>
-                <div class="fs-5 fw-bold text-center mt-2 mb-2">Chưa có thông tin!</div>
+                <div class="display-6 fw-bold text-center content mt-2 mb-2">THÔNG TIN HỒ SƠ TUYỂN SINH VÀO LỚP 10</div>
+                <div class="text-center">
+                    <a class="btn btn-primary" href="themhoso.html">Thêm hồ sơ mới</a>
+                </div>
+                <table class="table text-center justify-center">
+                    <thead>
+                        <tr>
+                            <th>Mã số học sinh</th>
+                            <th>Họ và tên học sinh</th>
+                            <th>Giới tính</th>
+                            <th>Ngày sinh</th>
+                            <th>Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-tbody">
+
+                    </tbody>
+                </table>
             </div>
             <!-- Footer -->
             <div class="bg-success text-white d-flex flex-column flex-lg-row">
@@ -119,6 +136,66 @@
                     window.location.href = '/logout'; // Nếu người dùng xác nhận, chuyển hướng đến route logout
                 }
             }
+            // Xử lý thêm danh sách hồ sơ của học sinh tại trường THCS
+            fetch('/thcs/hocsinh')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Mạng lỗi');
+                    }
+                    return response.json();
+                })
+                .then(students => {
+                    const tableBody = document.getElementById('student-tbody');
+
+                    students.forEach(student => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                    <td>${student.MA_HOC_SINH}</td>
+                    <td>${student.HO_TEN_HOC_SINH}</td>
+                    <td>${student.GIOI_TINH}</td>
+                    <td>${new Date(student.NGAY_SINH).toLocaleDateString()}</td>
+                    <td>
+                        <a class="btn btn-success" href="/chitiethoso.html?id=${student.MA_HOC_SINH}">Xem chi tiết</a>
+                        <a class="btn btn-warning" href="/suahoso.html?id=${student.MA_HOC_SINH}">Sửa hồ sơ</a>
+                        <a class="btn btn-danger" onclick="deleteStudent('${student.MA_HOC_SINH}')">Xóa hồ sơ</a>
+                    </td>
+                `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Có lỗi xảy ra khi tải danh sách học sinh:', error);
+                });
+            function deleteStudent(studentId) {
+                if (confirm(`Bạn có chắc chắn muốn xóa hồ sơ của học sinh có mã số ${studentId}?`)) {
+                    // Xóa kết quả học tập trước
+                    fetch(`/thcs/hocsinh/${studentId}/kqht`, {
+                        method: 'DELETE',
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Có lỗi xảy ra trong quá trình xóa kết quả học tập');
+                            }
+                            // Nếu xóa kết quả học tập thành công, tiếp tục xóa hồ sơ học sinh
+                            return fetch(`/thcs/hocsinh/${studentId}`, {
+                                method: 'DELETE',
+                            });
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                alert('Xóa hồ sơ thành công!');
+                                location.reload(); // Reload trang hoặc xóa dòng tương ứng trong bảng
+                            } else {
+                                throw new Error('Có lỗi xảy ra trong quá trình xóa hồ sơ');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Có lỗi xảy ra:', error);
+                            alert('Có lỗi xảy ra trong quá trình xóa hồ sơ!');
+                        });
+                }
+            }
+
         </script>
     </body>
 
