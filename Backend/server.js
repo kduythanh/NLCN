@@ -497,7 +497,7 @@ app.delete("/account/{accountName}", (req, res) => {
 app.get("/thcs/hocsinh", (req, res) => {
   if (req.session.doiTuong === "thcs") {
     db.query(
-      "SELECT MA_HOC_SINH, HO_TEN_HOC_SINH, GIOI_TINH, NGAY_SINH FROM HOC_SINH WHERE MA_THCS = ?",
+      "SELECT MA_HOC_SINH, HO_TEN_HOC_SINH, GIOI_TINH, NGAY_SINH, timNguyenVong(MA_HOC_SINH, 1) NV1, timLopChuyen(MA_HOC_SINH) LOP_CHUYEN, timMonChuyen(MA_HOC_SINH) MON_CHUYEN, timNguyenVong(MA_HOC_SINH, 2) NV2, timNguyenVong(MA_HOC_SINH, 3) NV3, timNguyenVong(MA_HOC_SINH, 4) NV4, timNguyenVong(MA_HOC_SINH, 5) NV5 FROM HOC_SINH WHERE MA_THCS = ?",
       [req.session.maTruong],
       (err, results) => {
         if (err) {
@@ -812,6 +812,88 @@ app.delete("/thcs/hocsinh/:hocsinhId/kqht", (req, res) => {
     }
   );
 });
+app.post("/thcs/hocsinh/:hocsinhId/nguyenvong/1", (req, res) => {
+  const hocsinhId = req.params.hocsinhId;
+  const { LOP_CHUYEN, MON_CHUYEN } = req.body;
+  db.query(
+    "INSERT INTO NGUYEN_VONG VALUES (?, '13', 1, ?, ?)",
+    [hocsinhId, LOP_CHUYEN, MON_CHUYEN],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .send("Có lỗi xảy ra trong quá trình thêm nguyện vọng");
+      }
+      return res
+        .status(201)
+        .json({ message: "Thêm nguyện vọng 1 thành công!", results });
+    }
+  );
+});
+app.post("/thcs/hocsinh/:hocsinhId/nguyenvong/:nv", (req, res) => {
+  const hocsinhId = req.params.hocsinhId;
+  const nv = req.params.nv;
+  const { MA_TRUONG } = req.body;
+  db.query(
+    "INSERT INTO NGUYEN_VONG VALUES (?, ?, ?, '', '')",
+    [hocsinhId, MA_TRUONG, nv],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .send("Có lỗi xảy ra trong quá trình thêm nguyện vọng");
+      }
+      return res
+        .status(201)
+        .json({ message: "Thêm nguyện vọng thành công!", results });
+    }
+  );
+});
+app.delete("/thcs/hocsinh/:hocsinhId/nguyenvong", (req, res) => {
+  const hocsinhId = req.params.hocsinhId;
+  db.query(
+    "DELETE FROM NGUYEN_VONG WHERE MA_HOC_SINH = ?",
+    [hocsinhId],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .send("Có lỗi xảy ra trong quá trình xóa nguyện vọng");
+      }
+      return res
+        .status(201)
+        .json({ message: "Xóa nguyện vọng thành công!", results });
+    }
+  );
+});
+app.get("/thcs/hocsinh/:hocsinhId/nguyenvong/:nv", (req, res) => {
+  const hocsinhId = req.params.hocsinhId;
+  const nv = req.params.nv;
+
+  db.query(
+    "SELECT NGUYEN_VONG.MA_THPT, TEN_THPT, LOP_CHUYEN, MON_CHUYEN FROM NGUYEN_VONG JOIN TRUONG_THPT ON NGUYEN_VONG.MA_THPT = TRUONG_THPT.MA_THPT WHERE MA_HOC_SINH = ? AND THU_TU = ?",
+    [hocsinhId, nv],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .send("Có lỗi xảy ra trong quá trình tra cứu nguyện vọng");
+      }
+      // Kiểm tra xem có kết quả nào không
+      if (results.length === 0) {
+        // Trả về null nếu không tìm thấy
+        return res.json(null);
+      }
+      // Trả về kết quả nếu tìm thấy
+      res.json(results[0]);
+    }
+  );
+});
+
 app.get("/dantoc", (req, res) => {
   db.query("SELECT * FROM DAN_TOC", (err, results) => {
     if (err) {

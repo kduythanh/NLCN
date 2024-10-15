@@ -140,8 +140,24 @@
                                 <td id="student-TEN_DT_KHUYEN_KHICH"></td>
                             </tr>
                             <tr class="align-items-stretch">
-                                <td scope="row" class="col-3 fw-bold">Duyệt</th>
-                                <td id="student-DUYET"></td>
+                                <td scope="row" class="col-3 fw-bold">Nguyện vọng 1<br>(THPT Chuyên Lý Tự Trọng)</th>
+                                <td id="student-NV1"></td>
+                            </tr>
+                            <tr class="align-items-stretch">
+                                <td scope="row" class="col-3 fw-bold">Nguyện vọng 2</th>
+                                <td id="student-NV2"></td>
+                            </tr>
+                            <tr class="align-items-stretch">
+                                <td scope="row" class="col-3 fw-bold">Nguyện vọng 3</th>
+                                <td id="student-NV3"></td>
+                            </tr>
+                            <tr class="align-items-stretch">
+                                <td scope="row" class="col-3 fw-bold">Nguyện vọng 4</th>
+                                <td id="student-NV4"></td>
+                            </tr>
+                            <tr class="align-items-stretch">
+                                <td scope="row" class="col-3 fw-bold">Nguyện vọng 5</th>
+                                <td id="student-NV5"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -224,68 +240,56 @@
                     document.getElementById('student-MA_THCS').textContent = student.TEN_THCS;
                     document.getElementById('student-TEN_DT_UU_TIEN').textContent = student.TEN_DT_UU_TIEN;
                     document.getElementById('student-TEN_DT_KHUYEN_KHICH').textContent = student.TEN_DT_KHUYEN_KHICH;
-                    document.getElementById('student-DUYET').textContent = student.DUYET ? 'Đã duyệt' : 'Chưa duyệt';
                 })
                 .catch(error => {
                     console.error('Có lỗi xảy ra khi tải hồ sơ học sinh:', error);
                 });
+            const khoiLop = [6, 7, 8, 9]; // Danh sách các lớp
+            khoiLop.forEach(lop => {
+                fetch(`/thcs/hocsinh/${studentId}/kqht/${lop}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Có lỗi xảy ra trong quá trình tải hồ sơ học sinh');
+                        }
+                        return response.json();
+                    })
+                    .then(student => {
+                        // Cập nhật nội dung tương ứng với lớp
+                        document.getElementById(`HL${lop}`).textContent = student.HOC_LUC;
+                        document.getElementById(`HK${lop}`).textContent = student.HANH_KIEM;
+                    })
+                    .catch(error => {
+                        console.error('Có lỗi xảy ra khi tải hồ sơ học sinh:', error);
+                    });
+            });
 
-            fetch(`/thcs/hocsinh/${studentId}/kqht/6`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Có lỗi xảy ra trong quá trình tải hồ sơ học sinh');
+            fetch(`/thcs/hocsinh/${studentId}/nguyenvong/1`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data === null) {
+                        document.getElementById(`student-NV1`).textContent = '';
+                    } else {
+                        document.getElementById(`student-NV1`).textContent = "Chuyên " + data.LOP_CHUYEN + ", môn " + data.MON_CHUYEN;
                     }
-                    return response.json();
-                })
-                .then(student => {
-                    document.getElementById('HL6').textContent = student.HOC_LUC;
-                    document.getElementById('HK6').textContent = student.HANH_KIEM;
                 })
                 .catch(error => {
-                    console.error('Có lỗi xảy ra khi tải hồ sơ học sinh:', error);
+                    console.error('Lỗi:', error);
                 });
-            fetch(`/thcs/hocsinh/${studentId}/kqht/7`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Có lỗi xảy ra trong quá trình tải hồ sơ học sinh');
-                    }
-                    return response.json();
-                })
-                .then(student => {
-                    document.getElementById('HL7').textContent = student.HOC_LUC;
-                    document.getElementById('HK7').textContent = student.HANH_KIEM;
-                })
-                .catch(error => {
-                    console.error('Có lỗi xảy ra khi tải hồ sơ học sinh:', error);
-                });
-            fetch(`/thcs/hocsinh/${studentId}/kqht/8`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Có lỗi xảy ra trong quá trình tải hồ sơ học sinh');
-                    }
-                    return response.json();
-                })
-                .then(student => {
-                    document.getElementById('HL8').textContent = student.HOC_LUC;
-                    document.getElementById('HK8').textContent = student.HANH_KIEM;
-                })
-                .catch(error => {
-                    console.error('Có lỗi xảy ra khi tải hồ sơ học sinh:', error);
-                });
-            fetch(`/thcs/hocsinh/${studentId}/kqht/9`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Có lỗi xảy ra trong quá trình tải hồ sơ học sinh');
-                    }
-                    return response.json();
-                })
-                .then(student => {
-                    document.getElementById('HL9').textContent = student.HOC_LUC;
-                    document.getElementById('HK9').textContent = student.HANH_KIEM;
-                })
-                .catch(error => {
-                    console.error('Có lỗi xảy ra khi tải hồ sơ học sinh:', error);
-                });
+            const nv = [2, 3, 4, 5];
+            nv.forEach(nvong => {
+                fetch(`/thcs/hocsinh/${studentId}/nguyenvong/${nvong}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data === null) {
+                            document.getElementById(`student-NV${nvong}`).textContent = '';
+                        } else {
+                            document.getElementById(`student-NV${nvong}`).textContent = data.TEN_THPT;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Lỗi:', error);
+                    });
+            });   
         </script>
     </body>
 

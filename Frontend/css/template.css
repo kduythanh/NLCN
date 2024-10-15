@@ -70,3 +70,15 @@ tr {
 .hidden {
     display: none; /* Ẩn các phần tử khi không cần thiết */
 }
+table {
+    width: max-content;
+    /* Đảm bảo bảng sẽ mở rộng theo kích thước nội dung */
+    table-layout: auto;
+    /* Tự động điều chỉnh kích thước các cột dựa trên nội dung */
+}
+
+table th,
+table td {
+    white-space: nowrap;
+    /* Ngăn nội dung xuống dòng */
+}

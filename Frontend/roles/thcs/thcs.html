@@ -65,25 +65,34 @@
         </div>
         <div class="content">
             <!-- Quản lý tài khoản -->
-            <div class="container flex-column justify-content-between my-auto text-black">
+            <div class="container justify-content-between my-auto text-black">
                 <div class="display-6 fw-bold text-center content mt-2 mb-2">THÔNG TIN HỒ SƠ TUYỂN SINH VÀO LỚP 10</div>
                 <div class="text-center">
                     <a class="btn btn-primary" href="themhoso.html">Thêm hồ sơ mới</a>
                 </div>
-                <table class="table text-center justify-center">
-                    <thead>
-                        <tr>
-                            <th>Mã số học sinh</th>
-                            <th>Họ và tên học sinh</th>
-                            <th>Giới tính</th>
-                            <th>Ngày sinh</th>
-                            <th>Ghi chú</th>
-                        </tr>
-                    </thead>
-                    <tbody id="student-tbody">
+                <div class="overflow-x-auto">
+                    <table class="table absolute--fill text-center justify-center nowrap"
+                        style="table-layout: auto; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>MSHS</th>
+                                <th>Họ và tên học sinh</th>
+                                <th>Giới tính</th>
+                                <th>Ngày sinh</th>
+                                <th>Nguyện vọng 1<br>(THPT Chuyên Lý Tự Trọng)</th>
+                                <th>Nguyện vọng 2</th>
+                                <th>Nguyện vọng 3</th>
+                                <th>Nguyện vọng 4</th>
+                                <th>Nguyện vọng 5</th>
+                                <th>Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-tbody">
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
             <!-- Footer -->
             <div class="bg-success text-white d-flex flex-column flex-lg-row">
@@ -149,11 +158,25 @@
 
                     students.forEach(student => {
                         const row = document.createElement('tr');
+                        let NV1data;
+                        if (student.NV1 === null) NV1data = "";
+                        else {
+                            NV1data = "Chuyên " + student.LOP_CHUYEN + ", môn " + student.MON_CHUYEN;
+                        }
+                        if (student.NV2 === null) student.NV2 = "";
+                        if (student.NV3 === null) student.NV3 = "";
+                        if (student.NV4 === null) student.NV4 = "";
+                        if (student.NV5 === null) student.NV5 = "";
                         row.innerHTML = `
                     <td>${student.MA_HOC_SINH}</td>
                     <td>${student.HO_TEN_HOC_SINH}</td>
                     <td>${student.GIOI_TINH}</td>
                     <td>${new Date(student.NGAY_SINH).toLocaleDateString()}</td>
+                    <td>${NV1data}</td>
+                    <td>${student.NV2}</td>
+                    <td>${student.NV3}</td>
+                    <td>${student.NV4}</td>
+                    <td>${student.NV5}</td>
                     <td>
                         <a class="btn btn-success" href="/chitiethoso.html?id=${student.MA_HOC_SINH}">Xem chi tiết</a>
                         <a class="btn btn-warning" href="/suahoso.html?id=${student.MA_HOC_SINH}">Sửa hồ sơ</a>
@@ -166,6 +189,7 @@
                 .catch(error => {
                     console.error('Có lỗi xảy ra khi tải danh sách học sinh:', error);
                 });
+            // Hàm xóa hồ sơ học sinh
             function deleteStudent(studentId) {
                 if (confirm(`Bạn có chắc chắn muốn xóa hồ sơ của học sinh có mã số ${studentId}?`)) {
                     // Xóa kết quả học tập trước
@@ -176,7 +200,16 @@
                             if (!response.ok) {
                                 throw new Error('Có lỗi xảy ra trong quá trình xóa kết quả học tập');
                             }
-                            // Nếu xóa kết quả học tập thành công, tiếp tục xóa hồ sơ học sinh
+                            // Nếu xóa kết quả học tập thành công, tiếp tục xóa nguyện vọng
+                            return fetch(`/thcs/hocsinh/${studentId}/nguyenvong`, {
+                                method: 'DELETE', // Xóa tất cả nguyện vọng
+                            });
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Có lỗi xảy ra trong quá trình xóa nguyện vọng');
+                            }
+                            // Nếu xóa nguyện vọng thành công, tiếp tục xóa hồ sơ học sinh
                             return fetch(`/thcs/hocsinh/${studentId}`, {
                                 method: 'DELETE',
                             });
@@ -195,7 +228,6 @@
                         });
                 }
             }
-
         </script>
     </body>
 

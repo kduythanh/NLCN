@@ -65,7 +65,7 @@
         </div>
         <div class="content">
             <!-- Quản lý tài khoản -->
-            <div class="container flex-column justify-content-between my-auto text-black ">
+            <div class="container flex-column justify-content-between mb-2 text-black ">
                 <div class="display-6 fw-bold text-center content mt-2 mb-2">SỬA THÔNG TIN HỒ SƠ</div>
                 <form>
                     <div class="mb-3 row">
@@ -247,13 +247,64 @@
                             </select>
                         </div>
                     </div>
+                    <div class="mb-3 row">
+                        <label class="col-sm-3 col-form-label fw-bold">Nguyện vọng 1<br>(THPT Chuyên
+                            Lý Tự Trọng)</label>
+                        <div class="col-sm-9">
+                            <label for="NV1-LC" class="form-label">Lớp chuyên:</label>
+                            <select class="form-select d-inline-block w-auto" id="NV1-LC" name="NV1-LC">
+                                <option value="0">KHÔNG CHỌN</option>
+                                <option value="Toán">Toán</option>
+                                <option value="Vật lý">Vật lý</option>
+                                <option value="Hóa học">Hóa học</option>
+                                <option value="Sinh học">Sinh học</option>
+                                <option value="Tin học">Tin học</option>
+                                <option value="Ngữ văn">Ngữ văn</option>
+                                <option value="Lịch sử">Lịch sử</option>
+                                <option value="Địa lý">Địa lý</option>
+                                <option value="Tiếng Anh">Tiếng Anh</option>
+                                <option value="Tiếng Pháp">Tiếng Pháp</option>
+                            </select>
+                            <label for="NV1-MC" class="form-label">Môn chuyên:</label>
+                            <select class="form-select d-inline-block w-auto" id="NV1-MC" name="NV1-MC">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="NV2" class="col-sm-3 col-form-label fw-bold">Nguyện vọng 2<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <select class="form-select" id="NV2" name="NV2">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="NV3" class="col-sm-3 col-form-label fw-bold">Nguyện vọng 3</label>
+                        <div class="col-sm-9">
+                            <select class="form-select" id="NV3" name="NV3">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="NV4" class="col-sm-3 col-form-label fw-bold">Nguyện vọng 4</label>
+                        <div class="col-sm-9">
+                            <select class="form-select" id="NV4" name="NV4">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="NV5" class="col-sm-3 col-form-label fw-bold">Nguyện vọng 5</label>
+                        <div class="col-sm-9">
+                            <select class="form-select" id="NV5" name="NV5">
+                            </select>
+                        </div>
+                    </div>
                     <div class="d-flex justify-content-center">
                         <button type="reset" class="btn btn-warning mx-2">Khôi phục</button>
                         <button type="submit" class="btn btn-success mx-2" onclick="updateStudent(event)">Sửa hồ
                             sơ</button>
                     </div>
                 </form>
-                <div id="student-info"></div>
             </div>
             <!-- Footer -->
             <div class="bg-success text-white d-flex flex-column flex-lg-row">
@@ -360,6 +411,38 @@
                     });
                 })
                 .catch(error => console.error('Error fetching data:', error));
+
+            fetch('/highschool')
+                .then(response => response.json())
+                .then(data => {
+                    // Lọc bỏ trường có mã số 13
+                    const filteredSchools = data.filter(school => school.MA_THPT !== "13");
+
+                    // Hàm để tạo và thêm các option vào select
+                    const addOptionsToSelect = (selectId) => {
+                        const selectElement = document.getElementById(selectId);
+                        // Thêm tùy chọn "KHÔNG CHỌN" với value = "0"
+                        const defaultOption = document.createElement('option');
+                        defaultOption.value = "0";
+                        defaultOption.text = "KHÔNG CHỌN";
+                        selectElement.appendChild(defaultOption);
+                        filteredSchools.forEach(school => {
+                            const option = document.createElement('option');
+                            option.value = school.MA_THPT;  // Giá trị của option là mã trường
+                            option.text = school.TEN_THPT;  // Hiển thị tên trường
+                            selectElement.appendChild(option);
+                        });
+                    };
+
+                    // Cập nhật cho các select tương ứng
+                    addOptionsToSelect('NV2');
+                    addOptionsToSelect('NV3');
+                    addOptionsToSelect('NV4');
+                    addOptionsToSelect('NV5');
+                })
+                .catch(error => {
+                    console.error('Lỗi khi lấy dữ liệu từ /highschool:', error);
+                });
             // Xử lý hiển thị danh sách hồ sơ của học sinh tại trường THCS
             const studentId = new URLSearchParams(window.location.search).get('id');
 
@@ -415,6 +498,106 @@
                         console.error(`Có lỗi xảy ra khi tải hồ sơ học sinh lớp ${khoi}:`, error);
                     });
             });
+            // Xử lý hiển thị nguyện vọng
+            fetch(`/thcs/hocsinh/${studentId}/nguyenvong/1`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data === null) {
+                        document.getElementById(`NV1-LC`).value = 0;
+                        document.getElementById("NV1-MC").disabled = true;
+                    } else {
+                        document.getElementById(`NV1-LC`).value = data.LOP_CHUYEN;
+                        document.getElementById("NV1-MC").disabled = false;
+                        var lcSelect = document.getElementById("NV1-LC");
+                        var mcSelect = document.getElementById("NV1-MC");
+                        var selectedValue = lcSelect.value;
+
+                        // Xóa tất cả các tùy chọn trong NV1-MC
+                        mcSelect.innerHTML = "";
+
+                        if (selectedValue === "0") {
+                            // Nếu chọn "KHÔNG CHỌN", disable NV1-MC
+                            mcSelect.disabled = true;
+                        } else {
+                            // Nếu không phải "KHÔNG CHỌN", enable NV1-MC
+                            mcSelect.disabled = false;
+
+                            if (selectedValue === "Tin học") {
+                                // Nếu chọn "Tin học", thêm 2 tùy chọn Toán và Tin học
+                                var option1 = document.createElement("option");
+                                option1.value = "Toán";
+                                option1.text = "Toán";
+                                mcSelect.appendChild(option1);
+
+                                var option2 = document.createElement("option");
+                                option2.value = "Tin học";
+                                option2.text = "Tin học";
+                                mcSelect.appendChild(option2);
+                            } else {
+                                // Nếu chọn bất kỳ môn nào khác, thêm 1 tùy chọn trùng với môn đã chọn
+                                var option = document.createElement("option");
+                                option.value = selectedValue;
+                                option.text = selectedValue;
+                                mcSelect.appendChild(option);
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi:', error);
+                });
+            // Gán giá trị sau khi tùy chọn đã được thêm vào
+            const nv = [2, 3, 4, 5];
+            nv.forEach(nvong => {
+                fetch(`/thcs/hocsinh/${studentId}/nguyenvong/${nvong}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data === null) {
+                            document.getElementById(`NV${nvong}`).value = "0"; // Gán lại giá trị KHÔNG CHỌN
+                        } else {
+                            document.getElementById(`NV${nvong}`).value = data.MA_THPT; // Gán mã trường
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Lỗi:', error);
+                    });
+            });
+            // Xử lý thay đổi nguyện vọng
+            document.getElementById("NV1-LC").addEventListener("change", function () {
+                var lcSelect = document.getElementById("NV1-LC");
+                var mcSelect = document.getElementById("NV1-MC");
+                var selectedValue = lcSelect.value;
+
+                // Xóa tất cả các tùy chọn trong NV1-MC
+                mcSelect.innerHTML = "";
+
+                if (selectedValue === "0") {
+                    // Nếu chọn "KHÔNG CHỌN", disable NV1-MC
+                    mcSelect.disabled = true;
+                } else {
+                    // Nếu không phải "KHÔNG CHỌN", enable NV1-MC
+                    mcSelect.disabled = false;
+
+                    if (selectedValue === "Tin học") {
+                        // Nếu chọn "Tin học", thêm 2 tùy chọn Toán và Tin học
+                        var option1 = document.createElement("option");
+                        option1.value = "Toán";
+                        option1.text = "Toán";
+                        mcSelect.appendChild(option1);
+
+                        var option2 = document.createElement("option");
+                        option2.value = "Tin học";
+                        option2.text = "Tin học";
+                        mcSelect.appendChild(option2);
+                    } else {
+                        // Nếu chọn bất kỳ môn nào khác, thêm 1 tùy chọn trùng với môn đã chọn
+                        var option = document.createElement("option");
+                        option.value = selectedValue;
+                        option.text = selectedValue;
+                        mcSelect.appendChild(option);
+                    }
+                }
+            });
             // Cập nhật hồ sơ học sinh
             function updateStudent(event) {
                 event.preventDefault();
@@ -437,7 +620,13 @@
                     DienThoai: document.getElementById('DienThoai').value,
                     DanToc: document.getElementById('DanToc').value,
                     DTUuTien: document.getElementById('DTUuTien').value,
-                    DTKhuyenKhich: document.getElementById('DTKhuyenKhich').value
+                    DTKhuyenKhich: document.getElementById('DTKhuyenKhich').value,
+                    NV1LC: document.getElementById('NV1-LC').value,
+                    NV1MC: document.getElementById('NV1-MC').value,
+                    NV2: document.getElementById('NV2').value,
+                    NV3: document.getElementById('NV3').value,
+                    NV4: document.getElementById('NV4').value,
+                    NV5: document.getElementById('NV5').value
                 };
                 fetch(`/thcs/hocsinh/${studentId}`, {
                     method: 'PATCH',
@@ -472,6 +661,48 @@
                             });
                         });
                         return Promise.all(promises);
+                    })
+                    .then(() => {
+                        // Xóa nguyện vọng cũ
+                        return fetch(`/thcs/hocsinh/${studentId}/nguyenvong`, {
+                            method: 'DELETE'
+                        });
+                    })
+                    .then(() => {
+                        // Thêm nguyện vọng (NV1 trước, sau đó là NV2-5)
+                        const nvPromises = [];
+
+                        // Thêm nguyện vọng 1
+                        if (formData.NV1LC && formData.NV1LC !== '0') {
+                            const nv1Data = {
+                                LOP_CHUYEN: formData.NV1LC,
+                                MON_CHUYEN: formData.NV1MC
+                            };
+                            console.log(nv1Data.value);
+                            nvPromises.push(fetch(`/thcs/hocsinh/${formData.MSHS}/nguyenvong/1`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(nv1Data)
+                            }));
+                        }
+
+                        // Thêm nguyện vọng từ 2-5
+                        [2, 3, 4, 5].forEach(nv => {
+                            const nvField = formData[`NV${nv}`];
+                            if (nvField && nvField !== '0') {
+                                const nvData = { MA_TRUONG: nvField };
+                                console.log(nvData.value);
+                                nvPromises.push(fetch(`/thcs/hocsinh/${formData.MSHS}/nguyenvong/${nv}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(nvData)
+                                }));
+                            }
+                        });
                     })
                     .then(() => {
                         alert('Cập nhật hồ sơ thành công!');
