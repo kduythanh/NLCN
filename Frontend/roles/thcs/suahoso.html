@@ -64,10 +64,10 @@
             </div>
         </div>
         <div class="content">
-            <!-- Quản lý tài khoản -->
+            <!-- Sửa thông tin hồ sơ -->
             <div class="container flex-column justify-content-between mb-2 text-black ">
                 <div class="display-6 fw-bold text-center content mt-2 mb-2">SỬA THÔNG TIN HỒ SƠ</div>
-                <form>
+                <form onsubmit="updateStudent(event)" novalidate>
                     <div class="mb-3 row">
                         <label for="MSHS" class="col-sm-3 col-form-label fw-bold">Mã số học sinh<span
                                 class="text-danger">*</span></label>
@@ -118,13 +118,13 @@
                     <div class="mb-3 row">
                         <label for="HKTT" class="col-sm-3 col-form-label fw-bold">Hộ khẩu thường trú</label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="HKTT" name="HKTT" required>
+                            <input type="text" class="form-control" id="HKTT" name="HKTT">
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="COHN" class="col-sm-3 col-form-label fw-bold">Chỗ ở hiện nay</label>
                         <div class="col-sm-9">
-                            <input type="text" class="form-control" id="COHN" name="COHN" required>
+                            <input type="text" class="form-control" id="COHN" name="COHN">
                         </div>
                     </div>
                     <div class="mb-3 row">
@@ -133,13 +133,13 @@
                         <div class="col-sm-9">
                             <span class="mb-2 fw-bold">Lớp 6: </span>
                             <label for="HocLuc6" class="form-label">Học lực</label>
-                            <select class="form-select d-inline-block w-auto" id="HocLuc6">
+                            <select class="form-select d-inline-block w-auto" id="HocLuc6" required>
                                 <option value="Giỏi">Giỏi</option>
                                 <option value="Khá">Khá</option>
                                 <option value="Trung bình">Trung bình</option>
                             </select>
                             <label for="HanhKiem6" class="form-label">Hạnh kiểm</label>
-                            <select class="form-select d-inline-block w-auto" id="HanhKiem6">
+                            <select class="form-select d-inline-block w-auto" id="HanhKiem6" required>
                                 <option value="Tốt">Tốt</option>
                                 <option value="Khá">Khá</option>
                                 <option value="Trung bình">Trung bình</option>
@@ -150,13 +150,13 @@
                         <div class="col-sm-9 offset-sm-3">
                             <span class="mb-2 fw-bold">Lớp 7: </span>
                             <label for="HocLuc7" class="form-label">Học lực</label>
-                            <select class="form-select d-inline-block w-auto" id="HocLuc7">
+                            <select class="form-select d-inline-block w-auto" id="HocLuc7" required>
                                 <option value="Giỏi">Giỏi</option>
                                 <option value="Khá">Khá</option>
                                 <option value="Trung bình">Trung bình</option>
                             </select>
                             <label for="HanhKiem7" class="form-label">Hạnh kiểm</label>
-                            <select class="form-select d-inline-block w-auto" id="HanhKiem7">
+                            <select class="form-select d-inline-block w-auto" id="HanhKiem7" required>
                                 <option value="Tốt">Tốt</option>
                                 <option value="Khá">Khá</option>
                                 <option value="Trung bình">Trung bình</option>
@@ -167,13 +167,13 @@
                         <div class="col-sm-9 offset-sm-3">
                             <span class="mb-2 fw-bold">Lớp 8: </span>
                             <label for="HocLuc8" class="form-label">Học lực</label>
-                            <select class="form-select d-inline-block w-auto" id="HocLuc8">
+                            <select class="form-select d-inline-block w-auto" id="HocLuc8" required>
                                 <option value="Giỏi">Giỏi</option>
                                 <option value="Khá">Khá</option>
                                 <option value="Trung bình">Trung bình</option>
                             </select>
                             <label for="HanhKiem8" class="form-label">Hạnh kiểm</label>
-                            <select class="form-select d-inline-block w-auto" id="HanhKiem8">
+                            <select class="form-select d-inline-block w-auto" id="HanhKiem8" required>
                                 <option value="Tốt">Tốt</option>
                                 <option value="Khá">Khá</option>
                                 <option value="Trung bình">Trung bình</option>
@@ -184,13 +184,13 @@
                         <div class="col-sm-9 offset-sm-3">
                             <span class="mb-2 fw-bold">Lớp 9: </span>
                             <label for="HocLuc9" class="form-label">Học lực</label>
-                            <select class="form-select d-inline-block w-auto" id="HocLuc9">
+                            <select class="form-select d-inline-block w-auto" id="HocLuc9" required>
                                 <option value="Giỏi">Giỏi</option>
                                 <option value="Khá">Khá</option>
                                 <option value="Trung bình">Trung bình</option>
                             </select>
                             <label for="HanhKiem9" class="form-label">Hạnh kiểm</label>
-                            <select class="form-select d-inline-block w-auto" id="HanhKiem9">
+                            <select class="form-select d-inline-block w-auto" id="HanhKiem9" required>
                                 <option value="Tốt">Tốt</option>
                                 <option value="Khá">Khá</option>
                                 <option value="Trung bình">Trung bình</option>
@@ -228,14 +228,14 @@
                     <div class="mb-3 row">
                         <label for="DienThoai" class="col-sm-3 col-form-label fw-bold">Số điện thoại</label>
                         <div class="col-sm-9">
-                            <input type="tel" class="form-control" id="DienThoai" name="DienThoai" required>
+                            <input type="tel" class="form-control" id="DienThoai" name="DienThoai">
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label for="DTUuTien" class="col-sm-3 col-form-label fw-bold">Đối tượng ưu tiên<span
                                 class="text-danger">*</span></label>
                         <div class="col-sm-9">
-                            <select class="form-select" id="DTUuTien">
+                            <select class="form-select" id="DTUuTien" required>
                             </select>
                         </div>
                     </div>
@@ -243,7 +243,7 @@
                         <label for="DTKhuyenKhich" class="col-sm-3 col-form-label fw-bold">Đối tượng khuyến khích<span
                                 class="text-danger">*</span></label>
                         <div class="col-sm-9">
-                            <select class="form-select" id="DTKhuyenKhich">
+                            <select class="form-select" id="DTKhuyenKhich" required>
                             </select>
                         </div>
                     </div>
@@ -301,8 +301,7 @@
                     </div>
                     <div class="d-flex justify-content-center">
                         <button type="reset" class="btn btn-warning mx-2">Khôi phục</button>
-                        <button type="submit" class="btn btn-success mx-2" onclick="updateStudent(event)">Sửa hồ
-                            sơ</button>
+                        <button type="submit" class="btn btn-success mx-2">Sửa hồ sơ</button>
                     </div>
                 </form>
             </div>
@@ -331,6 +330,7 @@
             }
             window.addEventListener('load', adjustPadding); // Gọi hàm khi tải trang
             window.addEventListener('resize', adjustPadding); // Gọi hàm khi thay đổi kích thước cửa sổ
+            var maTruong = "";
             // Xử lý thêm họ tên học sinh vào chỗ Xin chào
             fetch('/api/thcs')
                 .then(response => {
@@ -341,6 +341,7 @@
                 })
                 .then(data => {
                     document.getElementById('greeting').innerText = 'Xin chào, ' + data.tenTruong.toUpperCase() + '!';
+                    maTruong = data.maTruong;
                 })
                 .catch(error => {
                     console.error(error);
@@ -434,18 +435,40 @@
                         });
                     };
 
-                    // Cập nhật cho các select tương ứng
-                    addOptionsToSelect('NV2');
-                    addOptionsToSelect('NV3');
-                    addOptionsToSelect('NV4');
-                    addOptionsToSelect('NV5');
+                    if (maTruong === "99999") {
+                        // Trường hợp maTruong là 'ngoaitpct'
+                        const selectElement = document.getElementById('NV2');
+                        selectElement.innerHTML = '';
+
+                        // Tạo tùy chọn "KHÔNG CHỌN"
+                        const defaultOption = document.createElement('option');
+                        defaultOption.value = "0";
+                        defaultOption.text = "KHÔNG CHỌN";
+                        selectElement.appendChild(defaultOption);
+
+                        // Thêm tùy chọn cho trường có MA_THPT = "63"
+                        const specificOption = document.createElement('option');
+                        specificOption.value = "63";
+                        specificOption.text = filteredSchools.find(school => school.MA_THPT === "63").TEN_THPT;
+                        selectElement.appendChild(specificOption);
+
+                        // Disable các select NV3, NV4, NV5
+                        document.getElementById('NV3').disabled = true;
+                        document.getElementById('NV4').disabled = true;
+                        document.getElementById('NV5').disabled = true;
+                    } else {
+                        // Cập nhật cho các select như bình thường
+                        addOptionsToSelect('NV2');
+                        addOptionsToSelect('NV3');
+                        addOptionsToSelect('NV4');
+                        addOptionsToSelect('NV5');
+                    }
                 })
                 .catch(error => {
                     console.error('Lỗi khi lấy dữ liệu từ /highschool:', error);
                 });
             // Xử lý hiển thị danh sách hồ sơ của học sinh tại trường THCS
             const studentId = new URLSearchParams(window.location.search).get('id');
-
             fetch(`/thcs/hocsinh/${studentId}`)
                 .then(response => {
                     if (!response.ok) {
@@ -454,6 +477,7 @@
                     return response.json();
                 })
                 .then(student => {
+                    originalData = student;
                     document.getElementById('MSHS').value = student.MA_HOC_SINH;
                     document.getElementById('MSHS').readOnly = true;
                     document.getElementById('HoTenHS').value = student.HO_TEN_HOC_SINH;
@@ -601,6 +625,76 @@
             // Cập nhật hồ sơ học sinh
             function updateStudent(event) {
                 event.preventDefault();
+                const form = document.querySelector('form');
+                const inputs = form.querySelectorAll('input[required], select[required]'); // Get all required inputs
+
+                let allValid = true;
+
+                // Loop through the required inputs and check for validity
+                inputs.forEach(input => {
+                    if (!input.value) {
+                        // If the input is empty, mark it as invalid
+                        allValid = false;
+                        input.classList.add('is-invalid'); // Add Bootstrap's invalid class
+                    } else {
+                        // If the input is valid, remove the invalid class
+                        input.classList.remove('is-invalid');
+                        input.classList.add('is-valid'); // Optional: Add valid class for styling
+                    }
+                });
+
+                // If any required fields are missing, show an alert
+                if (!allValid) {
+                    alert("Vui lòng nhập đầy đủ các trường có dấu *.");
+                    return; // Stop the function to prevent submission
+                }
+                const NV1 = document.getElementById('NV1-LC').value;
+                const NV2 = document.getElementById('NV2').value;
+                const NV3Element = document.getElementById('NV3');
+                const NV4Element = document.getElementById('NV4');
+                const NV5Element = document.getElementById('NV5');
+                const NV3 = NV3Element.disabled ? "0" : NV3Element.value;
+                const NV4 = NV4Element.disabled ? "0" : NV4Element.value;
+                const NV5 = NV5Element.disabled ? "0" : NV5Element.value;
+                let alertMessage = "";
+
+                // NV2 là bắt buộc nếu học sinh không chọn NV1
+                if (NV1 === "0" && NV2 === "0") {
+                    allValid = false;
+                    alertMessage += "Vui lòng chọn Nguyện vọng 2 nếu bạn không chọn Nguyện vọng 1!\n";
+                }
+
+                // NV3 chỉ được chọn khi đã chọn NV2
+                if (!NV3Element.disabled && NV2 === "0" && NV3 !== "0") {
+                    allValid = false;
+                    alertMessage += "Vui lòng chọn Nguyện vọng 2 trước khi chọn Nguyện vọng 3!\n";
+                }
+
+                // NV4 chỉ chọn được khi đã chọn NV2 và NV3
+                if (!NV4Element.disabled && (NV2 === "0" || NV3 === "0") && NV4 !== "0") {
+                    allValid = false;
+                    alertMessage += "Vui lòng chọn Nguyện vọng 2 và 3 trước khi chọn Nguyện vọng 4!\n";
+                }
+
+                // NV5 chỉ chọn được khi đã chọn NV2, NV3, và NV4
+                if (!NV5Element.disabled && (NV2 === "0" || NV3 === "0" || NV4 === "0") && NV5 !== "0") {
+                    allValid = false;
+                    alertMessage += "Vui lòng chọn Nguyện vọng 2, 3 và 4 trước khi chọn Nguyện vọng 5!\n";
+                }
+
+                // Các nguyện vọng từ 2-5 phải khác nhau
+                const selectedValues = [NV2, NV3, NV4, NV5].filter(value => value !== "0");
+                const uniqueValues = new Set(selectedValues);
+                if (selectedValues.length !== uniqueValues.size) {
+                    allValid = false;
+                    alertMessage += "Các nguyện vọng cần lựa chọn các trường THPT khác nhau!\n";
+                }
+
+                // If any validation fails, show an alert with the messages
+                if (!allValid) {
+                    alert(alertMessage);
+                    return; // Stop the function to prevent submission
+                }
                 // Confirmation dialog
                 const confirmRegistration = confirm("Bạn có chắc chắn muốn cập nhật hồ sơ này không?");
                 if (!confirmRegistration) {

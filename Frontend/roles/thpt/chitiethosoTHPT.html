@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Trang chủ Học sinh - Hệ thống tuyển sinh lớp 10 trực tuyến</title>
+        <title>Chi tiết hồ sơ học sinh - THPT</title>
         <!-- Link tới Bootstrap CSS -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
             integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -36,7 +36,7 @@
                     <img src="../../image/SGDDT.jpg" alt="logo" style="height: 70px;">
                 </div>
                 <div class="align-content-center">
-                    <a class="nav-link" href="./hocsinh.html">
+                    <a class="nav-link" href="thcs.html">
                         <p class="mb-0 fs-6">SỞ GIÁO DỤC VÀ ĐÀO TẠO TP CẦN THƠ</p>
                         <p class="mb-0 fw-bold fs-5">HỆ THỐNG TUYỂN SINH LỚP 10 TRỰC TUYẾN</p>
                     </a>
@@ -45,7 +45,7 @@
             <div class="col-sm-12 col-lg-5 d-flex">
                 <ul class="navbar-nav flex-row w-100 justify-content-end">
                     <li class="nav-item align-content-center px-3">
-                        <a class="nav-link text-center fs-5" href="./hocsinh.html">
+                        <a class="nav-link text-center fs-5" href="thcs.html">
                             <i class="bi bi-house-door-fill"></i>
                         </a>
                     </li>
@@ -53,8 +53,7 @@
                         <div>
                             <a id="greeting" class="nav-link text-end py-0 fw-bold" href="#"></a>
                             <div class="d-flex flex-row justify-content-end">
-                                <a class="nav-link text-end py-0 fs-5" href="./changePasswordStudent.html">Đổi mật
-                                    khẩu</a>
+                                <a class="nav-link text-end py-0 fs-5" href="changePasswordTHCS.html">Đổi mật khẩu</a>
                                 <span class="fs-5"> / </span>
                                 <a class="nav-link text-end py-0 fs-5" href="#" onclick="confirmLogout(event)">Đăng
                                     xuất</a>
@@ -67,7 +66,7 @@
         <div class="content">
             <!-- Quản lý tài khoản -->
             <div class="container flex-column justify-content-between my-auto text-black">
-                <div class="display-6 fw-bold text-center content mt-2 mb-2">THÔNG TIN HỌC SINH</div>
+                <div class="display-6 fw-bold text-center content mt-2 mb-2">CHI TIẾT HỒ SƠ</div>
                 <div class="table-responsive">
                     <table class="table">
                         <tbody>
@@ -168,7 +167,8 @@
             <div class="bg-success text-white d-flex flex-column flex-lg-row">
                 <div class="container">
                     <div class="text-center fw-bold mt-2">SỞ GIÁO DỤC VÀ ĐÀO TẠO THÀNH PHỐ CẦN THƠ</div>
-                    <div class="text-center">Địa chỉ: Số 39, đường 3 tháng 2, phường Xuân Khánh, quận Ninh Kiều, thành
+                    <div class="text-center">Địa chỉ: Số 39, đường 3 tháng 2, phường Xuân Khánh, quận Ninh Kiều,
+                        thành
                         phố
                         Cần Thơ</div>
                     <div class="text-center mb-2">Điện thoại: 0292.3830.753 - Fax: 0292.3830.451 - Email:
@@ -190,8 +190,7 @@
             window.addEventListener('load', adjustPadding); // Gọi hàm khi tải trang
             window.addEventListener('resize', adjustPadding); // Gọi hàm khi thay đổi kích thước cửa sổ
             // Xử lý thêm họ tên học sinh vào chỗ Xin chào
-            var studentId = "";
-            fetch('/api/hocsinh')
+            fetch('/api/thpt')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Bạn chưa đăng nhập.');
@@ -199,12 +198,7 @@
                     return response.json();
                 })
                 .then(data => {
-                    document.getElementById('greeting').innerText = 'Xin chào, ' + data.tenHocSinh.toUpperCase() + '!';
-                    studentId = data.tenTaiKhoan;
-                    // Sau khi studentId đã có giá trị, thực hiện các fetch phụ thuộc vào studentId
-                    fetchStudentProfile(studentId);
-                    fetchAcademicRecords(studentId);
-                    fetchNguyenVong(studentId);
+                    document.getElementById('greeting').innerText = 'Xin chào, ' + data.tenTruong.toUpperCase() + '!';
                 })
                 .catch(error => {
                     console.error(error);
@@ -212,85 +206,6 @@
                         window.location.href = "/";
                     }
                 });
-            function fetchStudentProfile(studentId) {
-                fetch(`/hocsinh/${studentId}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Có lỗi xảy ra trong quá trình tải hồ sơ học sinh');
-                        }
-                        return response.json();
-                    })
-                    .then(student => {
-                        document.getElementById('student-MA_HOC_SINH').textContent = student.MA_HOC_SINH;
-                        document.getElementById('student-HO_TEN_HOC_SINH').textContent = student.HO_TEN_HOC_SINH;
-                        document.getElementById('student-GIOI_TINH').textContent = student.GIOI_TINH;
-                        document.getElementById('student-NGAY_SINH').textContent = new Date(student.NGAY_SINH).toLocaleDateString();
-                        document.getElementById('student-TEN_DAN_TOC').textContent = student.TEN_DAN_TOC;
-                        document.getElementById('student-NOI_SINH').textContent = student.NOI_SINH;
-                        document.getElementById('student-HO_KHAU_THUONG_TRU').textContent = student.HO_KHAU_THUONG_TRU;
-                        document.getElementById('student-CHO_O_HIEN_NAY').textContent = student.CHO_O_HIEN_NAY;
-                        document.getElementById('student-NAM_TOT_NGHIEP_THCS').textContent = student.NAM_TOT_NGHIEP_THCS;
-                        document.getElementById('student-NGOAI_NGU_DANG_HOC').textContent = student.NGOAI_NGU_DANG_HOC;
-                        document.getElementById('student-NGOAI_NGU_DU_THI').textContent = student.NGOAI_NGU_DU_THI;
-                        document.getElementById('student-SO_DIEN_THOAI').textContent = student.SO_DIEN_THOAI;
-                        document.getElementById('student-MA_THCS').textContent = student.TEN_THCS;
-                        document.getElementById('student-TEN_DT_UU_TIEN').textContent = student.TEN_DT_UU_TIEN;
-                        document.getElementById('student-TEN_DT_KHUYEN_KHICH').textContent = student.TEN_DT_KHUYEN_KHICH;
-                    })
-                    .catch(error => {
-                        console.error('Có lỗi xảy ra khi tải hồ sơ học sinh:', error);
-                    });
-            }
-            function fetchAcademicRecords(studentId) {
-                const khoiLop = [6, 7, 8, 9]; // Danh sách các lớp
-                khoiLop.forEach(lop => {
-                    fetch(`/hocsinh/${studentId}/kqht/${lop}`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Có lỗi xảy ra trong quá trình tải hồ sơ học sinh');
-                            }
-                            return response.json();
-                        })
-                        .then(student => {
-                            // Cập nhật nội dung tương ứng với lớp
-                            document.getElementById(`HL${lop}`).textContent = student.HOC_LUC;
-                            document.getElementById(`HK${lop}`).textContent = student.HANH_KIEM;
-                        })
-                        .catch(error => {
-                            console.error('Có lỗi xảy ra khi tải hồ sơ học sinh:', error);
-                        });
-                });
-
-            }
-            function fetchNguyenVong(studentId) {
-                fetch(`/hocsinh/${studentId}/nguyenvong/1`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data === null) {
-                            document.getElementById(`student-NV1`).textContent = '';
-                        } else {
-                            document.getElementById(`student-NV1`).textContent = "Chuyên " + data.LOP_CHUYEN + ", môn " + data.MON_CHUYEN;
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Lỗi:', error);
-                    });
-                const nv = [2, 3, 4, 5];
-                nv.forEach(nvong => {
-                    fetch(`/hocsinh/${studentId}/nguyenvong/${nvong}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data === null) {
-                                document.getElementById(`student-NV${nvong}`).textContent = '';
-                            } else {
-                                document.getElementById(`student-NV${nvong}`).textContent = data.TEN_THPT;
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Lỗi:', error);
-                        });
-                });
-            }
 
             // Xử lý kiểm tra trước khi logout
             function confirmLogout(event) {
@@ -300,6 +215,81 @@
                     window.location.href = '/logout'; // Nếu người dùng xác nhận, chuyển hướng đến route logout
                 }
             }
+            // Xử lý thêm danh sách hồ sơ của học sinh tại trường THCS
+            const studentId = new URLSearchParams(window.location.search).get('id');
+            fetch(`/thcs/hocsinh/${studentId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Có lỗi xảy ra trong quá trình tải hồ sơ học sinh');
+                    }
+                    return response.json();
+                })
+                .then(student => {
+                    document.getElementById('student-MA_HOC_SINH').textContent = student.MA_HOC_SINH;
+                    document.getElementById('student-HO_TEN_HOC_SINH').textContent = student.HO_TEN_HOC_SINH;
+                    document.getElementById('student-GIOI_TINH').textContent = student.GIOI_TINH;
+                    document.getElementById('student-NGAY_SINH').textContent = new Date(student.NGAY_SINH).toLocaleDateString();
+                    document.getElementById('student-TEN_DAN_TOC').textContent = student.TEN_DAN_TOC;
+                    document.getElementById('student-NOI_SINH').textContent = student.NOI_SINH;
+                    document.getElementById('student-HO_KHAU_THUONG_TRU').textContent = student.HO_KHAU_THUONG_TRU;
+                    document.getElementById('student-CHO_O_HIEN_NAY').textContent = student.CHO_O_HIEN_NAY;
+                    document.getElementById('student-NAM_TOT_NGHIEP_THCS').textContent = student.NAM_TOT_NGHIEP_THCS;
+                    document.getElementById('student-NGOAI_NGU_DANG_HOC').textContent = student.NGOAI_NGU_DANG_HOC;
+                    document.getElementById('student-NGOAI_NGU_DU_THI').textContent = student.NGOAI_NGU_DU_THI;
+                    document.getElementById('student-SO_DIEN_THOAI').textContent = student.SO_DIEN_THOAI;
+                    document.getElementById('student-MA_THCS').textContent = student.TEN_THCS;
+                    document.getElementById('student-TEN_DT_UU_TIEN').textContent = student.TEN_DT_UU_TIEN;
+                    document.getElementById('student-TEN_DT_KHUYEN_KHICH').textContent = student.TEN_DT_KHUYEN_KHICH;
+                })
+                .catch(error => {
+                    console.error('Có lỗi xảy ra khi tải hồ sơ học sinh:', error);
+                });
+            const khoiLop = [6, 7, 8, 9]; // Danh sách các lớp
+            khoiLop.forEach(lop => {
+                fetch(`/thcs/hocsinh/${studentId}/kqht/${lop}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Có lỗi xảy ra trong quá trình tải hồ sơ học sinh');
+                        }
+                        return response.json();
+                    })
+                    .then(student => {
+                        // Cập nhật nội dung tương ứng với lớp
+                        document.getElementById(`HL${lop}`).textContent = student.HOC_LUC;
+                        document.getElementById(`HK${lop}`).textContent = student.HANH_KIEM;
+                    })
+                    .catch(error => {
+                        console.error('Có lỗi xảy ra khi tải hồ sơ học sinh:', error);
+                    });
+            });
+
+            fetch(`/thcs/hocsinh/${studentId}/nguyenvong/1`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data === null) {
+                        document.getElementById(`student-NV1`).textContent = '';
+                    } else {
+                        document.getElementById(`student-NV1`).textContent = "Chuyên " + data.LOP_CHUYEN + ", môn " + data.MON_CHUYEN;
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi:', error);
+                });
+            const nv = [2, 3, 4, 5];
+            nv.forEach(nvong => {
+                fetch(`/thcs/hocsinh/${studentId}/nguyenvong/${nvong}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data === null) {
+                            document.getElementById(`student-NV${nvong}`).textContent = '';
+                        } else {
+                            document.getElementById(`student-NV${nvong}`).textContent = data.TEN_THPT;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Lỗi:', error);
+                    });
+            });   
         </script>
     </body>
 

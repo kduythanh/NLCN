@@ -55,7 +55,8 @@
                             <div class="d-flex flex-row justify-content-end">
                                 <a class="nav-link text-end py-0 fs-5" href="changePasswordAdmin.html">Đổi mật khẩu</a>
                                 <span class="fs-5"> / </span>
-                                <a class="nav-link text-end py-0 fs-5" href="#" onclick="confirmLogout(event)">Đăng xuất</a>
+                                <a class="nav-link text-end py-0 fs-5" href="#" onclick="confirmLogout(event)">Đăng
+                                    xuất</a>
                             </div>
                         </div>
                     </li>
@@ -67,7 +68,7 @@
             <div class="container flex-column justify-content-between my-auto text-black">
                 <div class="display-6 fw-bold text-center content mt-2 mb-2">QUẢN LÝ TÀI KHOẢN</div>
                 <div class="text-center">
-                    <button type="button" class="btn btn-primary fs-5 mb-2">Thêm tài khoản mới</button>
+                    <a href="themtaikhoan.html" class="btn btn-primary fs-5 mb-2">Thêm tài khoản mới</a>
                 </div>
 
                 <table class="table table-bordered border-black fs-5 w-auto mx-auto" id="accountTable">
@@ -152,7 +153,6 @@
                             <td>${account.DOI_TUONG}</td>
                             <td class="text-end">${maTruong}</td>
                             <td class="text-center">
-                                <button class="btn btn-warning fs-5" onclick="editAccount('${account.TEN_TAI_KHOAN}')" ${isAdmin ? 'disabled' : ''}>Sửa thông tin</button>
                                 <button class="btn btn-danger fs-5" onclick="deleteAccount('${account.TEN_TAI_KHOAN}')" ${isAdmin ? 'disabled' : ''}>Xóa tài khoản</button>
                             </td>
                             `;
@@ -161,10 +161,6 @@
                     })
                     .catch(error => console.error('Có lỗi xảy ra:', error));
             });
-            // Hàm sửa thông tin tài khoản
-            function editAccount(accountName) {
-                // Thực hiện hành động sửa tại đây
-            }
             // Hàm xóa tài khoản
             function deleteAccount(accountName) {
                 const confirmDelete = confirm(`Bạn có chắc chắn muốn xóa tài khoản ${accountName}?`);

@@ -150,6 +150,7 @@ app.get("/admin", (req, res) => {
 });
 app.get("/api/admin", (req, res) => {
   if (req.session.tenTaiKhoan && req.session.doiTuong === "admin") {
+    console.log("Session hiện tại:", req.session);
     res.json({
       tenTaiKhoan: req.session.tenTaiKhoan,
       doiTuong: req.session.doiTuong,
@@ -205,6 +206,7 @@ app.get("/sgddt", (req, res) => {
 });
 app.get("/api/hdts", (req, res) => {
   if (req.session.tenTaiKhoan && req.session.doiTuong === "sgddt") {
+    console.log("Session hiện tại:", req.session);
     res.json({
       tenTaiKhoan: req.session.tenTaiKhoan,
       doiTuong: req.session.doiTuong,
@@ -260,10 +262,12 @@ app.get("/thcs", (req, res) => {
 });
 app.get("/api/thcs", (req, res) => {
   if (req.session.tenTaiKhoan && req.session.doiTuong === "thcs") {
+    console.log("Session hiện tại:", req.session);
     res.json({
       tenTaiKhoan: req.session.tenTaiKhoan,
       doiTuong: req.session.doiTuong,
       tenTruong: req.session.tenTruong,
+      maTruong: req.session.maTruong,
     });
   } else {
     res.send("Bạn không có quyền truy cập");
@@ -316,10 +320,12 @@ app.get("/thpt", (req, res) => {
 });
 app.get("/api/thpt", (req, res) => {
   if (req.session.tenTaiKhoan && req.session.doiTuong === "thpt") {
+    console.log("Session hiện tại:", req.session);
     res.json({
       tenTaiKhoan: req.session.tenTaiKhoan,
       doiTuong: req.session.doiTuong,
       tenTruong: req.session.tenTruong,
+      maTruong: req.session.maTruong,
     });
   } else {
     res.send("Bạn không có quyền truy cập");
@@ -363,6 +369,123 @@ app.put("/thpt", (req, res) => {
     }
   );
 });
+app.get("/thpt/hocsinh", (req, res) => {
+  const maTHPT = req.session.maTruong;
+  db.query(
+    `SELECT NV.*, hoc_sinh.HO_TEN_HOC_SINH, hoc_sinh.GIOI_TINH, hoc_sinh.NGAY_SINH, TEN_THCS FROM nguyen_vong NV
+    JOIN (SELECT MA_HOC_SINH, MIN(THU_TU) AS NVMAX FROM nguyen_vong GROUP BY MA_HOC_SINH) AS NVCN 
+    ON NV.MA_HOC_SINH = NVCN.MA_HOC_SINH AND NV.THU_TU = NVCN.NVMAX 
+    JOIN hoc_sinh ON NV.MA_HOC_SINH = hoc_sinh.MA_HOC_SINH 
+    JOIN TRUONG_THCS ON hoc_sinh.MA_THCS = TRUONG_THCS.MA_THCS WHERE MA_THPT = ?
+    ORDER BY SUBSTRING_INDEX(hoc_sinh.HO_TEN_HOC_SINH, ' ', -1), HO_TEN_HOC_SINH, NGAY_SINH`,
+    [maTHPT],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .send("Có lỗi xảy ra trong quá trình truy vấn thông tin học sinh");
+      }
+      res.json(results);
+    }
+  );
+});
+app.post("/thpt/thisinh", (req, res) => {
+  const maTHPT = req.session.maTruong;
+
+  // Lấy danh sách học sinh đăng ký vào trường từ câu lệnh bạn đã có
+  db.query(
+    `SELECT NV.*, hoc_sinh.MA_HOC_SINH, hoc_sinh.HO_TEN_HOC_SINH, hoc_sinh.GIOI_TINH, hoc_sinh.NGAY_SINH, TEN_THCS
+    FROM nguyen_vong NV
+    JOIN (SELECT MA_HOC_SINH, MIN(THU_TU) AS NVMAX FROM nguyen_vong GROUP BY MA_HOC_SINH) AS NVCN 
+    ON NV.MA_HOC_SINH = NVCN.MA_HOC_SINH AND NV.THU_TU = NVCN.NVMAX 
+    JOIN hoc_sinh ON NV.MA_HOC_SINH = hoc_sinh.MA_HOC_SINH 
+    JOIN TRUONG_THCS ON hoc_sinh.MA_THCS = TRUONG_THCS.MA_THCS
+    WHERE NV.MA_THPT = ?
+    ORDER BY SUBSTRING_INDEX(hoc_sinh.HO_TEN_HOC_SINH, ' ', -1), HO_TEN_HOC_SINH, NGAY_SINH`,
+    [maTHPT],
+    (err, students) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .send("Có lỗi xảy ra trong quá trình truy vấn thông tin học sinh");
+      }
+
+      // Tạo một danh sách các promise để xử lý cập nhật/insert song song
+      const queries = students.map((student) => {
+        return new Promise((resolve, reject) => {
+          db.query(
+            "INSERT IGNORE INTO thi_sinh (MA_HOC_SINH, MA_THPT) VALUES (?, ?)",
+            [student.MA_HOC_SINH, maTHPT],
+            (err, results) => {
+              if (err) reject(err);
+              else resolve(results);
+            }
+          );
+        });
+      });
+
+      // Thực hiện tất cả các truy vấn
+      Promise.all(queries)
+        .then(() => {
+          res.send("Cập nhật danh sách thí sinh thành công!");
+        })
+        .catch((error) => {
+          console.error(error);
+          res.status(500).send("Có lỗi xảy ra khi cập nhật danh sách thí sinh");
+        });
+    }
+  );
+});
+app.patch("/thpt/sbd", async (req, res) => {
+  const maTHPT = req.session.maTruong;
+
+  try {
+    // Bước 1: Xóa số báo danh hiện có cho tất cả các thí sinh của trường
+    await db
+      .promise()
+      .query("UPDATE thi_sinh SET SO_BAO_DANH = NULL WHERE MA_THPT = ?", [
+        maTHPT,
+      ]);
+
+    // Bước 2: Lấy danh sách thí sinh sắp xếp theo tên (dựa trên tên cuối cùng trong họ tên)
+    const [students] = await db.promise().query(
+      `SELECT hoc_sinh.MA_HOC_SINH, hoc_sinh.HO_TEN_HOC_SINH 
+       FROM hoc_sinh 
+       JOIN thi_sinh ON hoc_sinh.MA_HOC_SINH = thi_sinh.MA_HOC_SINH
+       WHERE thi_sinh.MA_THPT = ? 
+       ORDER BY SUBSTRING_INDEX(hoc_sinh.HO_TEN_HOC_SINH, ' ', -1), hoc_sinh.HO_TEN_HOC_SINH`,
+      [maTHPT]
+    );
+
+    // Bước 3: Đánh số báo danh theo quy tắc
+    const soBaoDanhList = students.map((student, index) => {
+      const soBaoDanh = `${maTHPT}${String(index + 1).padStart(4, "0")}`;
+      return [soBaoDanh, student.MA_HOC_SINH];
+    });
+
+    // Bước 4: Cập nhật số báo danh vào bảng thi_sinh
+    await Promise.all(
+      soBaoDanhList.map(([soBaoDanh, maHocSinh]) =>
+        db
+          .promise()
+          .query(
+            "UPDATE thi_sinh SET SO_BAO_DANH = ? WHERE MA_HOC_SINH = ? AND MA_THPT = ?",
+            [soBaoDanh, maHocSinh, maTHPT]
+          )
+      )
+    );
+
+    res.send("Cập nhật số báo danh thành công cho các thí sinh!");
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .send("Có lỗi xảy ra khi cập nhật số báo danh cho thí sinh.");
+  }
+});
+
 // Xử lý đăng nhập của học sinh
 app.get("/hocsinh", (req, res) => {
   if (req.session.tenTaiKhoan && req.session.doiTuong === "hocsinh") {
@@ -379,10 +502,76 @@ app.get("/api/hocsinh", (req, res) => {
       tenTaiKhoan: req.session.tenTaiKhoan,
       doiTuong: req.session.doiTuong,
       tenHocSinh: req.session.tenHocSinh,
+      maHocSinh: req.session.maHocSinh,
     });
   } else {
     res.send("Bạn không có quyền truy cập");
   }
+});
+app.get("/hocsinh/:hocsinhId", (req, res) => {
+  const hocsinhId = req.params.hocsinhId;
+  db.query(
+    "SELECT * FROM HOC_SINH JOIN DT_UU_TIEN ON HOC_SINH.MA_DT_UU_TIEN = DT_UU_TIEN.MA_DT_UU_TIEN JOIN DT_KHUYEN_KHICH ON HOC_SINH.MA_DT_KHUYEN_KHICH = DT_KHUYEN_KHICH.MA_DT_KHUYEN_KHICH JOIN TRUONG_THCS ON HOC_SINH.MA_THCS = TRUONG_THCS.MA_THCS WHERE MA_HOC_SINH = ?",
+    [hocsinhId],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .send("Có lỗi xảy ra trong quá trình truy vấn thông tin học sinh");
+      }
+      if (results.length === 0) {
+        return res.status(404).send("Không tìm thấy học sinh");
+      }
+      res.json(results[0]);
+    }
+  );
+});
+app.get("/hocsinh/:hocsinhId/kqht/:lop", (req, res) => {
+  const hocsinhId = req.params.hocsinhId;
+  const lop = req.params.lop;
+  db.query(
+    "SELECT * FROM KQ_HOC_TAP WHERE MA_HOC_SINH = ? AND LOP = ?",
+    [hocsinhId, lop],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .send(
+            "Có lỗi xảy ra trong quá trình truy vấn kết quả học tập học sinh"
+          );
+      }
+      if (results.length === 0) {
+        return res.status(404).send("Không tìm thấy thông tin");
+      }
+      res.json(results[0]);
+    }
+  );
+});
+app.get("/hocsinh/:hocsinhId/nguyenvong/:nv", (req, res) => {
+  const hocsinhId = req.params.hocsinhId;
+  const nv = req.params.nv;
+
+  db.query(
+    "SELECT NGUYEN_VONG.MA_THPT, TEN_THPT, LOP_CHUYEN, MON_CHUYEN FROM NGUYEN_VONG JOIN TRUONG_THPT ON NGUYEN_VONG.MA_THPT = TRUONG_THPT.MA_THPT WHERE MA_HOC_SINH = ? AND THU_TU = ?",
+    [hocsinhId, nv],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .send("Có lỗi xảy ra trong quá trình tra cứu nguyện vọng");
+      }
+      // Kiểm tra xem có kết quả nào không
+      if (results.length === 0) {
+        // Trả về null nếu không tìm thấy
+        return res.json(null);
+      }
+      // Trả về kết quả nếu tìm thấy
+      res.json(results[0]);
+    }
+  );
 });
 // Đổi mật khẩu của account Học sinh
 app.put("/hocsinh", (req, res) => {
@@ -432,6 +621,21 @@ app.get("/logout", (req, res) => {
     res.redirect("/"); // Chuyển hướng về trang chính hoặc trang đăng nhập
   });
 });
+// Hiển thị danh mục trường THCS
+app.get("/secondaryschool", (req, res) => {
+  db.query(
+    "SELECT MA_THCS, TEN_THCS, MA_QUAN_HUYEN FROM truong_thcs ORDER BY MA_QUAN_HUYEN",
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .send("Có lỗi xảy ra trong quá trình truy vấn danh sách trường THCS");
+      }
+      res.json(results);
+    }
+  );
+});
 // Hiển thị danh mục trường THPT
 app.get("/highschool", (req, res) => {
   db.query(
@@ -465,7 +669,7 @@ app.get("/highschoolName", (req, res) => {
 // Hiển thị danh mục tài khoản (chỉ hiển thị các mục cần thiết)
 app.get("/account", (req, res) => {
   db.query(
-    "SELECT TEN_TAI_KHOAN, DOI_TUONG, MA_TRUONG FROM TAI_KHOAN",
+    "SELECT TEN_TAI_KHOAN, DOI_TUONG, MA_TRUONG FROM TAI_KHOAN ORDER BY DOI_TUONG",
     (err, results) => {
       if (err) {
         console.error(err);
@@ -477,7 +681,21 @@ app.get("/account", (req, res) => {
     }
   );
 });
-// Sửa thông tin tài khoản
+// Thêm tài khoản
+app.post("/account", (req, res) => {
+  const { tenTaiKhoan, matKhau, doiTuong, maTruong } = req.body;
+  db.query(
+    "INSERT INTO TAI_KHOAN VALUES (?, ?, ?, ?)",
+    [tenTaiKhoan, matKhau, doiTuong, maTruong],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).send("Có lỗi xảy ra khi thêm tài khoản");
+      }
+      res.sendStatus(200); // Trả về thành công
+    }
+  );
+});
 // Xóa tài khoản
 app.delete("/account/{accountName}", (req, res) => {
   const accountName = req.params.accountName;
@@ -511,6 +729,52 @@ app.get("/thcs/hocsinh", (req, res) => {
     );
   }
 });
+app.post("/thcs/account", (req, res) => {
+  if (req.session.doiTuong === "thcs") {
+    const maTruong = req.session.maTruong;
+
+    // Truy vấn danh sách học sinh của trường
+    db.query(
+      "SELECT MA_HOC_SINH FROM HOC_SINH WHERE MA_THCS = ?",
+      [maTruong],
+      (err, students) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).send("Lỗi khi truy vấn học sinh");
+        }
+
+        // Duyệt qua danh sách học sinh và tạo tài khoản nếu chưa tồn tại
+        const queries = students.map((student) => {
+          const maHocSinh = student.MA_HOC_SINH;
+          const password = maHocSinh; // Mật khẩu là mã học sinh
+          const query = `
+            INSERT INTO TAI_KHOAN (TEN_TAI_KHOAN, MAT_KHAU, DOI_TUONG, MA_TRUONG)
+            SELECT ?, ?, 'hocsinh', ?
+            WHERE NOT EXISTS (
+              SELECT 1 FROM TAI_KHOAN WHERE TEN_TAI_KHOAN = ?
+            )
+          `;
+          return db
+            .promise()
+            .query(query, [maHocSinh, password, maTruong, maHocSinh]);
+        });
+
+        // Thực hiện tất cả các truy vấn
+        Promise.all(queries)
+          .then(() =>
+            res.send("Cấp tài khoản thành công cho học sinh chưa có tài khoản!")
+          )
+          .catch((error) => {
+            console.error(error);
+            res.status(500).send("Lỗi khi cấp tài khoản cho học sinh");
+          });
+      }
+    );
+  } else {
+    res.status(403).send("Bạn không có quyền thực hiện thao tác này");
+  }
+});
+
 // Lấy hồ sơ chi tiết của 1 học sinh
 app.get("/thcs/hocsinh/:hocsinhId", (req, res) => {
   const hocsinhId = req.params.hocsinhId;

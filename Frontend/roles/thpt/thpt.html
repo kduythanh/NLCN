@@ -55,7 +55,8 @@
                             <div class="d-flex flex-row justify-content-end">
                                 <a class="nav-link text-end py-0 fs-5" href="changePasswordTHPT.html">Đổi mật khẩu</a>
                                 <span class="fs-5"> / </span>
-                                <a class="nav-link text-end py-0 fs-5" href="#" onclick="confirmLogout(event)">Đăng xuất</a>
+                                <a class="nav-link text-end py-0 fs-5" href="#" onclick="confirmLogout(event)">Đăng
+                                    xuất</a>
                             </div>
                         </div>
                     </li>
@@ -65,8 +66,30 @@
         <div class="content">
             <!-- Quản lý tài khoản -->
             <div class="container flex-column justify-content-between my-auto text-black">
-                <div class="display-6 fw-bold text-center content mt-2 mb-2">THÔNG TIN HỒ SƠ CỦA TRƯỜNG</div>
-                <div class="fs-5 fw-bold text-center mt-2 mb-2">Chưa có thông tin!</div>
+                <div class="display-6 fw-bold text-center content mt-2 mb-2">DANH SÁCH HỌC SINH ĐĂNG KÝ</div>
+                <div class="text-center">
+                    <button class="btn btn-primary" id="updateStudentsButton">Cập nhật danh sách thí sinh</button>
+                    <button class="btn btn-info" id="update-sbd-button">Cập nhật số báo danh thí sinh</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="table absolute--fill text-center justify-center nowrap"
+                        style="table-layout: auto; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>MSHS</th>
+                                <th>Họ và tên học sinh</th>
+                                <th>Giới tính</th>
+                                <th>Ngày sinh</th>
+                                <th>Học sinh trường THCS</th>
+                                <th>Ghi chú</th>
+                                <th>Xem chi tiết</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-tbody">
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <!-- Footer -->
             <div class="bg-success text-white d-flex flex-column flex-lg-row">
@@ -110,7 +133,39 @@
                         window.location.href = "/";
                     }
                 });
+            fetch('/thpt/hocsinh')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Lỗi khi lấy thông tin học sinh.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const tbody = document.getElementById('student-tbody');
+                    tbody.innerHTML = ''; // Xóa nội dung cũ
 
+                    data.forEach(student => {
+                        const row = document.createElement('tr');
+                        var ghichu = "";
+                        if (student.MA_THPT === "13") {
+                            ghichu = `Chuyên ${student.LOP_CHUYEN}, môn ${student.MON_CHUYEN}`;
+                        }
+                        // Thêm các cột dữ liệu
+                        row.innerHTML = `
+                        <td>${student.MA_HOC_SINH}</td>
+                        <td class="text-start">${student.HO_TEN_HOC_SINH}</td>
+                        <td>${student.GIOI_TINH}</td>
+                        <td>${new Date(student.NGAY_SINH).toLocaleDateString()}</td>
+                        <td>${student.TEN_THCS}</td>
+                        <td class="text-start">${ghichu}</td>
+                        <td><a class="btn btn-success" href="chitiethosoTHPT.html?id=${student.MA_HOC_SINH}">Xem chi tiết</a></td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error(error);
+                });
             // Xử lý kiểm tra trước khi logout
             function confirmLogout(event) {
                 event.preventDefault(); // Ngăn chặn hành động mặc định của liên kết
@@ -119,6 +174,49 @@
                     window.location.href = '/logout'; // Nếu người dùng xác nhận, chuyển hướng đến route logout
                 }
             }
+            document.getElementById("updateStudentsButton").addEventListener("click", () => {
+                fetch("/thpt/thisinh", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Có lỗi xảy ra khi cập nhật danh sách thí sinh.");
+                        }
+                        return response.text();
+                    })
+                    .then(message => {
+                        alert(message); // Hiển thị thông báo từ server
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert("Đã xảy ra lỗi trong quá trình cập nhật danh sách.");
+                    });
+            });
+            document.getElementById("update-sbd-button").addEventListener("click", () => {
+                // Gửi yêu cầu PATCH đến server để cập nhật số báo danh
+                fetch("/thpt/sbd", {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.text(); // Lấy thông báo phản hồi từ server
+                        }
+                        throw new Error("Có lỗi xảy ra khi cập nhật số báo danh");
+                    })
+                    .then(message => {
+                        alert(message); // Hiển thị thông báo thành công từ server
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert("Không thể cập nhật số báo danh.");
+                    });
+            });
         </script>
     </body>
 

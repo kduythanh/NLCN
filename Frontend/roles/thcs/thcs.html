@@ -65,10 +65,11 @@
         </div>
         <div class="content">
             <!-- Quản lý tài khoản -->
-            <div class="container justify-content-between my-auto text-black">
+            <div class="container-fluid justify-content-between my-auto text-black">
                 <div class="display-6 fw-bold text-center content mt-2 mb-2">THÔNG TIN HỒ SƠ TUYỂN SINH VÀO LỚP 10</div>
                 <div class="text-center">
                     <a class="btn btn-primary" href="themhoso.html">Thêm hồ sơ mới</a>
+                    <button class="btn btn-info" onclick="capTaiKhoanHocSinh()">Cấp tài khoản cho học sinh</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="table absolute--fill text-center justify-center nowrap"
@@ -178,7 +179,7 @@
                     <td>${student.NV4}</td>
                     <td>${student.NV5}</td>
                     <td>
-                        <a class="btn btn-success" href="/chitiethoso.html?id=${student.MA_HOC_SINH}">Xem chi tiết</a>
+                        <a class="btn btn-success" href="chitiethosoTHCS.html?id=${student.MA_HOC_SINH}">Xem chi tiết</a>
                         <a class="btn btn-warning" href="/suahoso.html?id=${student.MA_HOC_SINH}">Sửa hồ sơ</a>
                         <a class="btn btn-danger" onclick="deleteStudent('${student.MA_HOC_SINH}')">Xóa hồ sơ</a>
                     </td>
@@ -189,6 +190,28 @@
                 .catch(error => {
                     console.error('Có lỗi xảy ra khi tải danh sách học sinh:', error);
                 });
+            function capTaiKhoanHocSinh() {
+                fetch("/thcs/account", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                })
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error("Có lỗi khi cấp tài khoản cho học sinh");
+                        }
+                        return response.text();
+                    })
+                    .then((message) => {
+                        alert(message);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        alert("Không thể cấp tài khoản cho học sinh.");
+                    });
+            }
+
             // Hàm xóa hồ sơ học sinh
             function deleteStudent(studentId) {
                 if (confirm(`Bạn có chắc chắn muốn xóa hồ sơ của học sinh có mã số ${studentId}?`)) {
