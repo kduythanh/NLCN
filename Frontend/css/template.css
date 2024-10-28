@@ -82,3 +82,25 @@ table td {
     white-space: nowrap;
     /* Ngăn nội dung xuống dòng */
 }
+.select2-container .select2-selection--single {
+    height: 38px;  /* Điều chỉnh chiều cao của select */
+    border-radius: 6px;  /* Điều chỉnh độ cong của khung tìm kiếm */
+    border: 1px solid black;   /* Bạn cũng có thể điều chỉnh màu viền */
+    color: black
+}
+.select2-container .select2-selection--single .select2-selection__rendered {
+    line-height: 36px; /* Điều chỉnh căn giữa văn bản trong khung */
+    color: black
+}
+
+.select2-container .select2-selection--single .select2-selection__arrow {
+    height: 36px;  /* Điều chỉnh chiều cao của mũi tên dropdown */
+    border-radius: 0 6px 6px 0; /* Độ cong cho phần mũi tên */
+    color: black
+}
+
+.select2-container .select2-results {
+    max-height: 200px;  /* Chiều cao tối đa của dropdown */
+    overflow-y: auto;   /* Hiển thị cuộn dọc nếu nội dung vượt quá chiều cao */
+    border-radius: 0 0 6px 6px;  /* Độ cong cho dropdown */
+}

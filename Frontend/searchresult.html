@@ -8,6 +8,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
             integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
         <link href="./css/template.css" rel="stylesheet">
     </head>
 
@@ -52,67 +53,61 @@
             <div class="full-width-background-2 d-flex">
                 <div class="overlay"></div>
                 <!-- Chức năng tra cứu kết quả -->
-                <div class="container-fluid d-flex justify-content-center">
-                    <form action="" method="POST" id="searchForm">
-                        <div class="card mt-5 bg-light">
-                            <div class="card-header text-center">
-                                <div class="fw-bold fs-3 text-black">
-                                    TRA CỨU KẾT QUẢ TUYỂN SINH LỚP 10 THPT NĂM HỌC 2025-2026
-                                </div>
-                            </div>
-                            <div class="card-body d-flex flex-column">
-                                <div class="row">
-                                    <label for="highschool" class="form-label h-100 col-3 col-form-label align-self-center">Hội đồng
-                                        thi:</label>
-                                    <div class="my-1 dropdown col-9" id="highschool" name="highschool">
-                                        <button
-                                            class="btn btn-light border-1 btn-outline-dark dropdown-toggle w-100 text-start"
-                                            type="button" id="highschoolButton" data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                            Chọn hội đồng thi
-                                        </button>
-                                        <ul id="highschoolArea" class="dropdown-menu w-100"
-                                            aria-labelledby="highschoolButton">
-                                            <!-- Điền dữ liệu mới vào đây -->
-                                        </ul>
+                <div class="container-fluid d-flex flex-column">
+                    <div class="col-9 mx-auto">
+                        <form id="searchForm">
+                            <div class="card mt-3 bg-light">
+                                <div class="card-header text-center">
+                                    <div class="fw-bold fs-3 text-black">
+                                        TRA CỨU KẾT QUẢ TUYỂN SINH LỚP 10 THPT NĂM HỌC 2025-2026
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <label for="typeofsearch" class="form-label h-100 col-3 col-form-label align-self-center">Tra cứu
-                                        theo:</label>
-                                    <div class="my-1 dropdown col-9" id="typeofsearch" name="typeofsearch">
-                                        <button
-                                            class="btn btn-light border-1 btn-outline-dark dropdown-toggle w-100 text-start"
-                                            type="button" id="typeofsearchButton" data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                            Chọn loại tìm kiếm
-                                        </button>
-                                        <ul class="dropdown-menu w-100" aria-labelledby="typeofsearchButton">
-                                            <li value="1"><a class="dropdown-item" href="#"
-                                                    onclick="updateDropdown('Theo số báo danh')">Theo số báo danh</a>
-                                            </li>
-                                            <li value="2"><a class="dropdown-item" href="#"
-                                                    onclick="updateDropdown('Theo mã học sinh')">Theo mã học sinh</a>
-                                            </li>
-                                            <li value="3"><a class="dropdown-item" href="#"
-                                                    onclick="updateDropdown('Theo họ và tên')">Theo họ và tên</a></li>
-                                        </ul>
+                                <div class="card-body d-flex flex-column">
+                                    <div class="row">
+                                        <label for="highschool"
+                                            class="form-label h-100 col-3 col-form-label align-self-center">Hội đồng
+                                            thi:</label>
+                                        <div class="my-1 dropdown col-9" id="highschool" name="highschool">
+                                            <select name="highschoolArea" id="highschoolArea"
+                                                class="form-select border-black overflow-y-auto focus-ring focus-ring-success">
+                                                <option value="" disabled selected>Chọn hội đồng thi</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label for="typeofsearch"
+                                            class="form-label h-100 col-3 col-form-label align-self-center">Tra cứu
+                                            theo:</label>
+                                        <div class="my-1 dropdown col-9" id="typeofsearch" name="typeofsearch">
+                                            <select name="typeofsearchArea" id="typeofsearchArea"
+                                                class="form-select border-black overflow-y-auto focus-ring focus-ring-success">
+                                                <option value="" disabled selected>Chọn loại tra cứu</option>
+                                                <option value="1">Theo số báo danh</option>
+                                                <option value="2">Theo mã học sinh</option>
+                                                <option value="3">Theo họ và tên</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label for="searchcontent"
+                                            class="form-label h-100 col-3 col-form-label align-self-center">Nội dung
+                                            tra cứu:</label>
+                                        <div class="my-1 col-9">
+                                            <input class="form-control border-black focus-ring focus-ring-success"
+                                                type="text" id="searchcontent" name="searchcontent"
+                                                placeholder="Nhập thông tin tra cứu" required>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <label for="searchcontent" class="form-label h-100 col-3 col-form-label align-self-center">Nội dung
-                                        tra cứu:</label>
-                                    <div class="my-1 col-9">
-                                        <input class="form-control border-black focus-ring focus-ring-success" type="text" id="searchcontent" name="searchcontent"
-                                            placeholder="Nhập thông tin tra cứu" required>
-                                    </div>
+                                <div class="card-footer text-center fw-bold text-black">
+                                    <button class="btn btn-success" type="submit">Tìm kiếm</button>
                                 </div>
                             </div>
-                            <div class="card-footer text-center fw-bold text-black">
-                                <button class="btn btn-success" type="submit">Tìm kiếm</button>
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
+                    <div id="result" class="col-9 mx-auto bg-white z-2 overflow-y-auto rounded mb-3"
+                        style="max-height: 500px;">
+                    </div>
                 </div>
             </div>
             <!-- Footer -->
@@ -131,6 +126,8 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
             </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
         <script>
             function adjustPadding() {
                 const header = document.querySelector('.navigation-bar');
@@ -150,6 +147,12 @@
             });
         </script>
         <script>
+            $(document).ready(function () {
+                $('#highschoolArea').select2({
+                    dropdownAutoWidth: true, // Tự động điều chỉnh chiều rộng
+                    width: '100%', // Chiều rộng của dropdown
+                });
+            });
             let schools = []; // Mảng để lưu danh sách trường
 
             // Gửi yêu cầu đến API
@@ -165,15 +168,154 @@
                 const highschoolArea = document.querySelector('#highschoolArea');
                 highschoolArea.innerHTML = ''; // Xóa nội dung cũ
 
+                // Tạo option mặc định
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                defaultOption.textContent = 'Chọn hội đồng thi';
+                highschoolArea.appendChild(defaultOption);
+
+                // Thêm các options từ danh sách trường học
                 schoolList.forEach(school => {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'dropdown-item';
-                    listItem.innerHTML = `${school.TEN_THPT}`;
-                    listItem.onclick = () => {
-                        document.getElementById('highschoolButton').innerHTML = `${school.TEN_THPT}`;
-                    };
-                    highschoolArea.appendChild(listItem);
+                    const option = document.createElement('option');
+                    option.value = school.MA_THPT; // Sử dụng thuộc tính phù hợp từ dữ liệu API cho value
+                    option.textContent = school.TEN_THPT;
+                    highschoolArea.appendChild(option);
                 });
+            }
+
+            document.getElementById("searchForm").addEventListener("submit", function (event) {
+                event.preventDefault(); // Ngăn form submit mặc định
+                // Lấy dữ liệu từ form
+                const highschool = document.getElementById("highschoolArea").value;
+                const searchType = document.getElementById("typeofsearchArea").value;
+                const searchContent = document.getElementById("searchcontent").value;
+                if (!highschool || !searchType || !searchContent) {
+                    alert("Vui lòng chọn trường, loại tìm kiếm và nhập nội dung tìm kiếm.");
+                    return; // Dừng lại nếu không hợp lệ
+                }
+                // Thiết lập URL với query parameters
+                const url = `/result?highschool=${highschool}&searchType=${searchType}&searchContent=${encodeURIComponent(searchContent)}`;
+                // Gửi yêu cầu GET qua fetch API
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Sắp xếp kết quả theo SO_BAO_DANH tăng dần
+                        data.sort((a, b) => a.SO_BAO_DANH - b.SO_BAO_DANH);
+
+                        // Hiển thị kết quả
+                        const resultDiv = document.getElementById("result");
+                        resultDiv.innerHTML = ''; // Xóa kết quả cũ
+
+                        if (data.length > 0) {
+                            const table = `
+                                <table class="table">
+                                    <thead class="text-center">
+                                        <tr>
+                                            <th>SBD</th>
+                                            <th>Họ và tên</th>
+                                            <th>Xem chi tiết</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${data.map(item => `
+                                            <tr>
+                                                <td class="text-center">${item.SO_BAO_DANH}</td>
+                                                <td>${item.HO_TEN_HOC_SINH}</td>
+                                                <td class="text-center">
+                                                    <button onclick="showDetails(${item.SO_BAO_DANH})" class="btn btn-primary">Xem chi tiết</button>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            `;
+                            if (data.length === 1) {
+                                showDetails(data[0].SO_BAO_DANH);
+                            } else {
+                                resultDiv.innerHTML = "<h4 class='text-center mt-1'>Vui lòng chọn thí sinh để xem chi tiết:</h4>";
+                                resultDiv.innerHTML += table;
+                            }
+                        } else {
+                            resultDiv.innerHTML = "<h4 class='text-center mt-1'>Không tìm thấy kết quả nào.</h4>";
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching results:", error);
+                    });
+            });
+
+            // Hàm hiển thị chi tiết
+            function showDetails(sbd) {
+                // Gửi yêu cầu để lấy thông tin chi tiết về học sinh
+                fetch(`/result/${sbd}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Tính toán tổng điểm
+                        const diemToan = parseFloat(data.DIEM_TOAN) || 0; // Giá trị mặc định là 0 nếu NULL
+                        const diemVan = parseFloat(data.DIEM_NGU_VAN) || 0; // Giá trị mặc định là 0 nếu NULL
+                        const diemNgoaiNgu = parseFloat(data.DIEM_NGOAI_NGU) || 0; // Giá trị mặc định là 0 nếu NULL
+                        const diemChuyen = parseFloat(data.DIEM_MON_CHUYEN) || 0; // Giá trị mặc định là 0 nếu NULL
+                        const diemCongUuTien = parseFloat(data.DC_UU_TIEN) || 0; // Giá trị mặc định là 0 nếu NULL
+                        const diemCongKhuyenKhich = parseFloat(data.DC_KHUYEN_KHICH) || 0; // Giá trị mặc định là 0 nếu NULL
+                        const totalScore = 2 * (diemToan + diemVan) + diemNgoaiNgu + diemCongUuTien;
+                        let totalSpecialScore;
+                        let totalSpecialScoreHtml = ""; // HTML cho tổng điểm chuyên
+
+                        if (data.DIEM_MON_CHUYEN !== null) {
+                            totalSpecialScore = diemToan + diemVan + diemNgoaiNgu + 2 * diemChuyen + diemCongKhuyenKhich;
+                            totalSpecialScoreHtml = `                                    <tr>
+                                        <td scope="row" class="col-8">Điểm môn chuyên:</th>
+                                        <td>${diemChuyen.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td scope="row" class="col-8">Điểm cộng Khuyến khích:</th>
+                                        <td>${diemCongKhuyenKhich.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td scope="row" class="col-8 fw-bold">Tổng điểm chuyên:</th>
+                                        <td class="fw-bold">${totalSpecialScore.toFixed(2)}</td>
+                                    </tr>`;
+                        }
+                        // Cập nhật nội dung div với thông tin chi tiết
+                        const resultDiv = document.getElementById("result");
+                        resultDiv.innerHTML = `
+                        <h3 class="text-center mt-1 text-success">ĐIỂM THI TUYỂN SINH LỚP 10 - NĂM HỌC 2025-2026</h5>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td colspan="2" class="text-center fw-bold">${data.HO_TEN_HOC_SINH} - Trường ${data.TEN_THCS}</td>
+                                    </tr>
+                                    <tr>
+                                        <td scope="row" class="col-8">Điểm Toán:</th>
+                                        <td>${data.DIEM_TOAN.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td scope="row" class="col-8">Điểm Ngữ văn:</th>
+                                        <td>${data.DIEM_NGU_VAN.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td scope="row" class="col-8">Điểm Ngoại ngữ:</th>
+                                        <td>${data.DIEM_NGOAI_NGU.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td scope="row" class="col-8">Điểm cộng Ưu tiên:</th>
+                                        <td>${data.DC_UU_TIEN.toFixed(2)}</td>
+                                    </tr>
+                                    <tr>
+                                        <td scope="row" class="col-8 fw-bold">Tổng điểm:</th>
+                                        <td class="fw-bold">${totalScore.toFixed(2)}</td>
+                                    </tr>
+                                    ${totalSpecialScoreHtml}
+                                </tbody>
+                            </table>
+                        `;
+                    })
+                    .catch(error => {
+                        console.error("Lỗi khi lấy kết quả học sinh:", error);
+                    });
+
             }
         </script>
     </body>

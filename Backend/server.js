@@ -26,6 +26,8 @@ app.use(express.static(path.join(__dirname, "../Frontend/roles/hdts")));
 app.use(express.static(path.join(__dirname, "../Frontend/roles/hocsinh")));
 app.use(express.static(path.join(__dirname, "../Frontend/roles/thcs")));
 app.use(express.static(path.join(__dirname, "../Frontend/roles/thpt")));
+// Middleware để sử dụng API routes
+app.use("/api", apiRoutes);
 // Cấu hình express-session
 app.use(
   session({
@@ -731,7 +733,7 @@ app.get("/highschool-hoso", (req, res) => {
 // Hiển thị tên các trường THPT
 app.get("/highschoolName", (req, res) => {
   db.query(
-    "SELECT TEN_THPT FROM truong_thpt ORDER BY MA_QUAN_HUYEN",
+    "SELECT MA_THPT, TEN_THPT FROM truong_thpt ORDER BY MA_QUAN_HUYEN",
     (err, results) => {
       if (err) {
         console.error(err);
@@ -1272,8 +1274,86 @@ app.get("/dtkhuyenkhich", (req, res) => {
     res.json(results);
   });
 });
-// Middleware để sử dụng API routes
-app.use("/api", apiRoutes);
+app.get("/result", (req, res) => {
+  const { highschool, searchType, searchContent } = req.query;
+
+  // Xây dựng câu lệnh SQL dựa trên loại tìm kiếm
+  var query = `
+    SELECT T.MA_HOC_SINH, HO_TEN_HOC_SINH, NGAY_SINH, SO_BAO_DANH, TEN_THCS,
+           DIEM_TOAN, DIEM_NGOAI_NGU, DIEM_NGU_VAN, DIEM_MON_CHUYEN,
+           DTUT.DIEM_CONG AS DC_UU_TIEN, DTKK.DIEM_CONG AS DC_KHUYEN_KHICH
+    FROM HOC_SINH H
+    JOIN THI_SINH T ON H.MA_HOC_SINH = T.MA_HOC_SINH
+    JOIN DT_UU_TIEN DTUT ON H.MA_DT_UU_TIEN = DTUT.MA_DT_UU_TIEN
+    JOIN DT_KHUYEN_KHICH DTKK ON H.MA_DT_KHUYEN_KHICH = DTKK.MA_DT_KHUYEN_KHICH
+    JOIN TRUONG_THCS THCS ON H.MA_THCS = THCS.MA_THCS
+  `;
+
+  // Thêm điều kiện WHERE cho từng loại tìm kiếm
+  const queryConditions = [];
+  const queryParams = [];
+
+  // Kiểm tra mã trường (Hội đồng thi)
+  if (highschool) {
+    queryConditions.push("T.MA_THPT = ?");
+    queryParams.push(highschool);
+  }
+
+  // Kiểm tra loại tìm kiếm
+  if (searchType === "1") {
+    queryConditions.push("T.SO_BAO_DANH = ?");
+    queryParams.push(searchContent);
+  } else if (searchType === "2") {
+    queryConditions.push("T.MA_HOC_SINH = ?");
+    queryParams.push(searchContent);
+  } else if (searchType === "3") {
+    queryConditions.push("H.HO_TEN_HOC_SINH LIKE ?");
+    queryParams.push(`%${searchContent}%`);
+  }
+
+  // Thêm điều kiện vào câu lệnh SQL
+  if (queryConditions.length > 0) {
+    query += ` WHERE ${queryConditions.join(" AND ")}`;
+  }
+  // Thực thi truy vấn
+  db.query(query, queryParams, (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Có lỗi xảy ra trong quá trình tra cứu điểm");
+    }
+    // Trả về kết quả nếu tìm thấy
+    res.json(results);
+  });
+});
+app.get("/result/:sbd", (req, res) => {
+  const sbd = req.params.sbd;
+
+  // Xây dựng câu lệnh SQL dựa trên loại tìm kiếm
+  var query = `
+    SELECT T.MA_HOC_SINH, HO_TEN_HOC_SINH, NGAY_SINH, SO_BAO_DANH, TEN_THCS,
+           DIEM_TOAN, DIEM_NGOAI_NGU, DIEM_NGU_VAN, DIEM_MON_CHUYEN,
+           DTUT.DIEM_CONG AS DC_UU_TIEN, DTKK.DIEM_CONG AS DC_KHUYEN_KHICH
+    FROM HOC_SINH H
+    JOIN THI_SINH T ON H.MA_HOC_SINH = T.MA_HOC_SINH
+    JOIN DT_UU_TIEN DTUT ON H.MA_DT_UU_TIEN = DTUT.MA_DT_UU_TIEN
+    JOIN DT_KHUYEN_KHICH DTKK ON H.MA_DT_KHUYEN_KHICH = DTKK.MA_DT_KHUYEN_KHICH
+    JOIN TRUONG_THCS THCS ON H.MA_THCS = THCS.MA_THCS
+    WHERE T.SO_BAO_DANH = ?
+  `;
+
+  // Thực thi truy vấn
+  db.query(query, [sbd], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("Có lỗi xảy ra trong quá trình tra cứu điểm");
+    }
+    if (results.length > 0) {
+      res.json(results[0]); // Trả về thông tin chi tiết
+    } else {
+      res.status(404).send("Không tìm thấy học sinh");
+    }
+  });
+});
 // Kiểm tra tồn tại session trong 1 trang
 app.get("/api/check-session", (req, res) => {
   if (req.session && req.session.tenTaiKhoan) {
