@@ -49,27 +49,9 @@
             </div>
         </div>
         <div class="content w-100">
-            <!-- Số lượng hồ sơ đăng ký -->
-            <div class="container-fluid flex-column justify-content-between my-auto text-black">
-                <div class="display-6 fw-bold text-center content mt-2 mb-2">CẬP NHẬT SỐ LƯỢNG HỒ SƠ ĐĂNG KÝ</div>
-                <!-- <div class="list-group border-1 mb-2">
-                    <a class="list-group-item list-group-item-action" href="./public/QDUB_40_0001.pdf">Quyết định của UBND TP Cần Thơ
-                        phê duyệt Kế hoạch tuyển sinh vào lớp 10</a>
-                    <a class="list-group-item list-group-item-action" href="./public/HuongDanTuyenSinh.pdf">Hướng dẫn tuyển sinh của Sở Giáo dục và
-                        Đào tạo TP Cần Thơ</a>
-                    <a class="list-group-item list-group-item-action" href="./public/QuyDinhTuyenSinh10_2024.pdf">Quy định thi tuyển sinh vào lớp 10 THPT</a>                        
-                    <a class="list-group-item list-group-item-action" href="./public/ChiTieuTuyenSinh2024.pdf">Chỉ tiêu tuyển sinh dự kiến của các
-                        trường THPT</a>
-                    <a class="list-group-item list-group-item-action" href="./public/PhieuDangKy2024.pdf">Phiếu đăng ký tuyển sinh vào lớp 10</a>
-                    <a class="list-group-item list-group-item-action" href="./public/DonPhucKhao.pdf">Đơn xin phúc khảo bài thi</a>
-                </div> -->
-            </div>
-            <div class="container-fluid"></div>
-                <hr class="border-black">
-            </div>
-            <!-- Thông tin các trường THPT -->
+            <!-- Thông tin các trường THPT - Cập nhật số lượng hồ sơ đăng ký -->
             <div class="container-fluid d-flex flex-column justify-content-between my-auto text-black mb-2">
-                <div class="display-6 fw-bold text-center content mt-2 mb-2">THÔNG TIN CÁC TRƯỜNG THPT</div>
+                <div class="display-6 fw-bold text-center content mt-2 mb-2">CẬP NHẬT SỐ LƯỢNG HỒ SƠ ĐĂNG KÝ</div>
                 <div class="container">
                     <table class="table table-bordered border-black" id="highschoolTable">
                         <thead class="text-center table-success text-white border-black align-middle">
@@ -78,6 +60,7 @@
                                 <th>Tên trường THPT</th>
                                 <th>Địa chỉ</th>
                                 <th>Chỉ tiêu</th>
+                                <th>Số thí sinh</th>
                             </tr>
                         </thead>
                         <tbody class="align-middle">
@@ -114,7 +97,7 @@
         <!-- Hiển thị danh mục trường THPT -->
         <script>
             // Gửi yêu cầu đến API
-            fetch('/highschool')
+            fetch('/highschool-hoso')
                 .then(response => response.json())
                 .then(data => {
                     const tableBody = document.querySelector('#highschoolTable tbody');
@@ -125,6 +108,7 @@
                             <td>${school.TEN_THPT}</td>
                             <td>${school.DIA_CHI}</td>
                             <td class="text-center">${school.CHI_TIEU}</td>
+                            <td class="text-center">${school.SO_THI_SINH}</td>
                         `;
                         tableBody.appendChild(row);
                     });
@@ -132,4 +116,5 @@
                 .catch(error => console.error('Lỗi khi hiển thị danh mục trường THPT:', error));
         </script>
     </body>
+
 </html>

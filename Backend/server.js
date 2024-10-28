@@ -215,6 +215,68 @@ app.get("/api/hdts", (req, res) => {
     res.send("Bạn không có quyền truy cập");
   }
 });
+app.get("/hdts/thisinh", (req, res) => {
+  db.query(
+    `SELECT * FROM thi_sinh 
+    JOIN hoc_sinh ON thi_sinh.MA_HOC_SINH = hoc_sinh.MA_HOC_SINH
+    JOIN truong_thcs ON hoc_sinh.MA_THCS = truong_thcs.MA_THCS
+    JOIN truong_thpt ON thi_sinh.MA_THPT = TRUONG_THPT.MA_THPT
+    WHERE SO_BAO_DANH IS NOT NULL ORDER BY SO_BAO_DANH`,
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .send("Có lỗi xảy ra trong quá trình truy vấn thông tin thí sinh");
+      }
+      res.json(results);
+    }
+  );
+});
+app.get("/hdts/thisinh/:sbd", (req, res) => {
+  const sbd = req.params.sbd;
+  db.query(
+    "SELECT * FROM thi_sinh JOIN hoc_sinh ON thi_sinh.MA_HOC_SINH = hoc_sinh.MA_HOC_SINH WHERE SO_BAO_DANH = ?",
+    [sbd],
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .send("Có lỗi xảy ra trong quá trình truy vấn thông tin thí sinh");
+      }
+      res.json(results[0]);
+    }
+  );
+});
+app.patch("/hdts/thisinh/:sbd", (req, res) => {
+  const sbd = req.params.sbd;
+  const { diemToan, diemVan, diemNgoaiNgu, diemChuyen } = req.body;
+
+  // Cấu trúc câu truy vấn và tham số dựa trên điều kiện điểm chuyên
+  let query =
+    "UPDATE thi_sinh SET DIEM_TOAN = ?, DIEM_NGU_VAN = ?, DIEM_NGOAI_NGU = ?";
+  const params = [diemToan, diemVan, diemNgoaiNgu];
+
+  if (diemChuyen !== undefined) {
+    query += ", DIEM_MON_CHUYEN = ?";
+    params.push(diemChuyen);
+  }
+
+  query += " WHERE SO_BAO_DANH = ?";
+  params.push(sbd);
+
+  db.query(query, params, (err) => {
+    if (err) {
+      console.error(err);
+      return res
+        .status(500)
+        .send("Có lỗi xảy ra trong quá trình cập nhật điểm thí sinh");
+    }
+    res.sendStatus(200);
+  });
+});
+
 // Đổi mật khẩu của account HĐTS
 app.put("/hdts", (req, res) => {
   const { currentPassword, newPassword, confirmNewPassword } = req.body;
@@ -640,6 +702,21 @@ app.get("/secondaryschool", (req, res) => {
 app.get("/highschool", (req, res) => {
   db.query(
     "SELECT MA_THPT, TEN_THPT, DIA_CHI, CHI_TIEU FROM truong_thpt ORDER BY MA_QUAN_HUYEN",
+    (err, results) => {
+      if (err) {
+        console.error(err);
+        return res
+          .status(500)
+          .send("Có lỗi xảy ra trong quá trình truy vấn danh sách trường THPT");
+      }
+      res.json(results);
+    }
+  );
+});
+// Hiển thị danh mục trường THPT
+app.get("/highschool-hoso", (req, res) => {
+  db.query(
+    "SELECT MA_THPT, TEN_THPT, DIA_CHI, CHI_TIEU, SO_THI_SINH(MA_THPT) SO_THI_SINH FROM truong_thpt ORDER BY MA_QUAN_HUYEN",
     (err, results) => {
       if (err) {
         console.error(err);

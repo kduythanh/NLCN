@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Cập nhật điểm thí sinh</title>
+        <!-- Link tới Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        <link href="../../css/template.css" rel="stylesheet">
+        <script>
+            async function checkSession() {
+                try {
+                    const response = await fetch('/api/check-session'); // Endpoint kiểm tra session
+                    if (!response.ok) {
+                        // Nếu không có session, chuyển hướng về trang chủ
+                        window.location.href = '/'; // Địa chỉ trang chủ
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi kiểm tra session:', error);
+                    window.location.href = '/'; // Chuyển hướng nếu có lỗi
+                }
+            }
+            // Kiểm tra session khi trang được tải
+            window.onload = checkSession;
+        </script>
+    </head>
+
+    <body>
+        <!-- Header -->
+        <div class="navigation-bar bg-success text-white d-flex flex-column flex-lg-row position-fixed z-2 w-100">
+            <div class="col-sm-12 col-lg-7 d-flex">
+                <div class="pe-3 align-content-center">
+                    <img src="../../image/SGDDT.jpg" alt="logo" style="height: 70px;">
+                </div>
+                <div class="align-content-center">
+                    <a class="nav-link" href="hdts.html">
+                        <p class="mb-0 fs-6">SỞ GIÁO DỤC VÀ ĐÀO TẠO TP CẦN THƠ</p>
+                        <p class="mb-0 fw-bold fs-5">HỆ THỐNG TUYỂN SINH LỚP 10 TRỰC TUYẾN</p>
+                    </a>
+                </div>
+            </div>
+            <div class="col-sm-12 col-lg-5 d-flex">
+                <ul class="navbar-nav flex-row w-100 justify-content-end">
+                    <li class="nav-item align-content-center px-3">
+                        <a class="nav-link text-center fs-5" href="hdts.html">
+                            <i class="bi bi-house-door-fill"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item align-content-center px-3">
+                        <div>
+                            <a id="greeting" class="nav-link text-end py-0 fw-bold" href="#"></a>
+                            <div class="d-flex flex-row justify-content-end">
+                                <a class="nav-link text-end py-0 fs-5" href="changePasswordHDTS.html">Đổi mật khẩu</a>
+                                <span class="fs-5"> / </span>
+                                <a class="nav-link text-end py-0 fs-5" href="#" onclick="confirmLogout(event)">Đăng
+                                    xuất</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="content">
+            <!-- Cập nhật điểm thí sinh -->
+            <div class="container flex-column justify-content-between mb-2 text-black ">
+                <div class="display-6 fw-bold text-center content mt-2 mb-2">CẬP NHẬT ĐIỂM THÍ SINH</div>
+                <form onsubmit="updateStudentMark(event)" novalidate>
+                    <div class="mb-3 row">
+                        <label for="MSHS" class="col-sm-3 col-form-label fw-bold">Số báo danh<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="SBD" name="SBD" required readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="MSHS" class="col-sm-3 col-form-label fw-bold">Họ và tên thí sinh<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="HoTenTS" name="HoTenTS" required readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="HoTenHS" class="col-sm-3 col-form-label fw-bold">Điểm Toán<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" id="DiemToan" name="DiemToan" min="0" max="10"
+                                required>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="HoTenHS" class="col-sm-3 col-form-label fw-bold">Điểm Ngoại ngữ<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" id="DiemNgoaiNgu" name="DiemNgoaiNgu" min="0"
+                                max="10" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="HoTenHS" class="col-sm-3 col-form-label fw-bold">Điểm Ngữ văn<span
+                                class="text-danger">*</span></label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" id="DiemNguVan" name="DiemNguVan" min="0" max="10"
+                                required>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="HoTenHS" class="col-sm-3 col-form-label fw-bold">Điểm môn chuyên<span
+                                class="text-danger"></span></label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" id="DiemChuyen" name="DiemChuyen" min="0"
+                                max="10">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <button type="reset" class="btn btn-warning mx-2">Khôi phục</button>
+                        <button type="submit" class="btn btn-success mx-2">Cập nhật điểm</button>
+                    </div>
+                </form>
+            </div>
+            <!-- Footer -->
+            <div class="bg-success text-white d-flex flex-column flex-lg-row">
+                <div class="container">
+                    <div class="text-center fw-bold mt-2">SỞ GIÁO DỤC VÀ ĐÀO TẠO THÀNH PHỐ CẦN THƠ</div>
+                    <div class="text-center">Địa chỉ: Số 39, đường 3 tháng 2, phường Xuân Khánh, quận Ninh Kiều, thành
+                        phố
+                        Cần Thơ</div>
+                    <div class="text-center mb-2">Điện thoại: 0292.3830.753 - Fax: 0292.3830.451 - Email:
+                        vanphong.socantho@moet.edu.vn, sogddt@cantho.gov.vn</div>
+                </div>
+            </div>
+        </div>
+        <!-- Link tới Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
+            </script>
+        <script>
+            // Điều chỉnh thanh header
+            function adjustPadding() {
+                const header = document.querySelector('.navigation-bar');
+                const headerHeight = header.offsetHeight; // Lấy chiều cao của header
+                document.body.style.paddingTop = headerHeight + 'px'; // Cập nhật padding-top cho body
+            }
+            window.addEventListener('load', adjustPadding); // Gọi hàm khi tải trang
+            window.addEventListener('resize', adjustPadding); // Gọi hàm khi thay đổi kích thước cửa sổ
+            // Xử lý thêm họ tên học sinh vào chỗ Xin chào
+            fetch('/api/hdts')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Bạn chưa đăng nhập.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('greeting').innerText = 'Xin chào, ' + "HĐTS TP CẦN THƠ" + '!';
+                })
+                .catch(error => {
+                    console.error(error);
+                    if (error.message === 'Bạn chưa đăng nhập.') {
+                        window.location.href = "/";
+                    }
+                });
+
+            // Xử lý kiểm tra trước khi logout
+            function confirmLogout(event) {
+                event.preventDefault(); // Ngăn chặn hành động mặc định của liên kết
+                const confirmation = confirm("Bạn có chắc chắn muốn đăng xuất không?");
+                if (confirmation) {
+                    window.location.href = '/logout'; // Nếu người dùng xác nhận, chuyển hướng đến route logout
+                }
+            }
+            const urlParams = new URLSearchParams(window.location.search);
+            const sbd = urlParams.get("sbd");
+            const hd = urlParams.get("hd");
+            function populateStudentScores() {
+                fetch(`/hdts/thisinh/${sbd}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Điền số báo danh và các trường điểm vào form
+                        document.getElementById("SBD").value = data.SO_BAO_DANH;
+                        document.getElementById("HoTenTS").value = data.HO_TEN_HOC_SINH;
+                        document.getElementById("DiemToan").value = data.DIEM_TOAN ?? 0;
+                        document.getElementById("DiemNgoaiNgu").value = data.DIEM_NGOAI_NGU ?? 0;
+                        document.getElementById("DiemNguVan").value = data.DIEM_NGU_VAN ?? 0;
+                        document.getElementById("DiemChuyen").value = data.DIEM_MON_CHUYEN ?? 0;
+                    })
+                    .catch(error => {
+                        console.error("Lỗi khi tải dữ liệu thí sinh:", error);
+                        alert("Không tìm thấy thông tin thí sinh hoặc có lỗi xảy ra.");
+                    });
+                if (hd !== "13") {
+                    document.getElementById("DiemChuyen").disabled = true;
+                } else {
+                    document.getElementById("DiemChuyen").disabled = false;
+                }
+            }
+            document.addEventListener("DOMContentLoaded", populateStudentScores);
+            function updateStudentMark(event) {
+                event.preventDefault();
+
+                const sbd = document.getElementById("SBD").value;
+                const diemToan = parseFloat(document.getElementById("DiemToan").value);
+                const diemNgoaiNgu = parseFloat(document.getElementById("DiemNgoaiNgu").value);
+                const diemVan = parseFloat(document.getElementById("DiemNguVan").value);
+                const diemChuyenElement = document.getElementById("DiemChuyen");
+
+                // Kiểm tra xem điểm môn chuyên có bị disabled không
+                const diemChuyen = diemChuyenElement.disabled ? undefined : parseFloat(diemChuyenElement.value);
+                // Kiểm tra tính hợp lệ của các điểm nhập vào (từ 0.0 đến 10.0)
+                const isScoreValid = [diemToan, diemNgoaiNgu, diemVan].every(
+                    (score) => score >= 0 && score <= 10
+                );
+
+                // Chỉ kiểm tra tính hợp lệ của điểm chuyên nếu trường đang hoạt động
+                if (!diemChuyenElement.disabled && (diemChuyen < 0 || diemChuyen > 10)) {
+                    alert("Điểm môn chuyên phải nằm trong khoảng từ 0.0 đến 10.0!");
+                    return;
+                }
+
+                if (!isScoreValid) {
+                    alert("Điểm nhập vào phải nằm trong khoảng từ 0.0 đến 10.0!");
+                    return;
+                }
+
+                // Hỏi xác nhận từ người dùng trước khi cập nhật
+                const confirmation = confirm(`Bạn có chắc chắn muốn cập nhật điểm cho thí sinh ${sbd}?`);
+                if (!confirmation) {
+                    return;
+                }
+                fetch(`/hdts/thisinh/${sbd}`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        diemToan,
+                        diemVan,
+                        diemNgoaiNgu,
+                        diemChuyen
+                    })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert("Cập nhật điểm thành công!");
+                            window.location.href = "hdts.html";
+                        } else {
+                            throw new Error("Cập nhật thất bại.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Lỗi:", error);
+                        alert("Có lỗi xảy ra khi cập nhật điểm.");
+                    });
+            }
+        </script>
+    </body>
+
+</html>
