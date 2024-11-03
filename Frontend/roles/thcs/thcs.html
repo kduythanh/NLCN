@@ -170,14 +170,14 @@
                         if (student.NV5 === null) student.NV5 = "";
                         row.innerHTML = `
                     <td>${student.MA_HOC_SINH}</td>
-                    <td>${student.HO_TEN_HOC_SINH}</td>
+                    <td class="text-start">${student.HO_TEN_HOC_SINH}</td>
                     <td>${student.GIOI_TINH}</td>
                     <td>${new Date(student.NGAY_SINH).toLocaleDateString()}</td>
-                    <td>${NV1data}</td>
-                    <td>${student.NV2}</td>
-                    <td>${student.NV3}</td>
-                    <td>${student.NV4}</td>
-                    <td>${student.NV5}</td>
+                    <td class="text-start">${NV1data}</td>
+                    <td class="text-start">${student.NV2}</td>
+                    <td class="text-start">${student.NV3}</td>
+                    <td class="text-start">${student.NV4}</td>
+                    <td class="text-start">${student.NV5}</td>
                     <td>
                         <a class="btn btn-success" href="chitiethosoTHCS.html?id=${student.MA_HOC_SINH}">Xem chi tiết</a>
                         <a class="btn btn-warning" href="/suahoso.html?id=${student.MA_HOC_SINH}">Sửa hồ sơ</a>
