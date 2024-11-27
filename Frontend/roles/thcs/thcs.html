@@ -13,14 +13,28 @@
         <script>
             async function checkSession() {
                 try {
-                    const response = await fetch('/api/check-session'); // Endpoint kiểm tra session
+                    // Gọi API kiểm tra session
+                    const response = await fetch('/api/check-session');
                     if (!response.ok) {
-                        // Nếu không có session, chuyển hướng về trang chủ
-                        window.location.href = '/'; // Địa chỉ trang chủ
+                        throw new Error('Session không hợp lệ');
+                    }
+                    // Gọi API kiểm tra role
+                    const roleResponse = await fetch('/api/thcs');
+                    if (!roleResponse.ok) {
+                        throw new Error('Người dùng không có quyền truy cập');
+                    }
+                    const roleData = await roleResponse.json();
+
+                    // Hiển thị lời chào
+                    document.getElementById('greeting').innerText = 'Xin chào, ' + roleData.tenTruong.toUpperCase() + '!';
+                    // Kiểm tra đối tượng
+                    if (roleData.doiTuong !== 'thcs') {
+                        alert('Bạn không có quyền truy cập vào trang này!');
+                        window.location.href = '/'; // Chuyển hướng về trang chủ
                     }
                 } catch (error) {
-                    console.error('Lỗi khi kiểm tra session:', error);
-                    window.location.href = '/'; // Chuyển hướng nếu có lỗi
+                    console.error('Lỗi khi kiểm tra session hoặc quyền:', error);
+                    window.location.href = '/'; // Chuyển hướng nếu không hợp lệ
                 }
             }
             // Kiểm tra session khi trang được tải
@@ -120,6 +134,14 @@
             }
             window.addEventListener('load', adjustPadding); // Gọi hàm khi tải trang
             window.addEventListener('resize', adjustPadding); // Gọi hàm khi thay đổi kích thước cửa sổ
+            // Xử lý kiểm tra trước khi logout
+            function confirmLogout(event) {
+                event.preventDefault(); // Ngăn chặn hành động mặc định của liên kết
+                const confirmation = confirm("Bạn có chắc chắn muốn đăng xuất không?");
+                if (confirmation) {
+                    window.location.href = '/logout'; // Nếu người dùng xác nhận, chuyển hướng đến route logout
+                }
+            }
             // Xử lý thêm họ tên học sinh vào chỗ Xin chào
             fetch('/api/thcs')
                 .then(response => {
@@ -137,38 +159,29 @@
                         window.location.href = "/";
                     }
                 });
-
-            // Xử lý kiểm tra trước khi logout
-            function confirmLogout(event) {
-                event.preventDefault(); // Ngăn chặn hành động mặc định của liên kết
-                const confirmation = confirm("Bạn có chắc chắn muốn đăng xuất không?");
-                if (confirmation) {
-                    window.location.href = '/logout'; // Nếu người dùng xác nhận, chuyển hướng đến route logout
-                }
-            }
             // Xử lý thêm danh sách hồ sơ của học sinh tại trường THCS
-            fetch('/thcs/hocsinh')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Mạng lỗi');
-                    }
-                    return response.json();
-                })
-                .then(students => {
-                    const tableBody = document.getElementById('student-tbody');
-
-                    students.forEach(student => {
-                        const row = document.createElement('tr');
-                        let NV1data;
-                        if (student.NV1 === null) NV1data = "";
-                        else {
-                            NV1data = "Chuyên " + student.LOP_CHUYEN + ", môn " + student.MON_CHUYEN;
+            function loadStudentList() {
+                fetch('/thcs/hocsinh')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Mạng lỗi');
                         }
-                        if (student.NV2 === null) student.NV2 = "";
-                        if (student.NV3 === null) student.NV3 = "";
-                        if (student.NV4 === null) student.NV4 = "";
-                        if (student.NV5 === null) student.NV5 = "";
-                        row.innerHTML = `
+                        return response.json();
+                    })
+                    .then(students => {
+                        const tableBody = document.getElementById('student-tbody');
+                        students.forEach(student => {
+                            const row = document.createElement('tr');
+                            let NV1data;
+                            if (student.NV1 === null) NV1data = "";
+                            else {
+                                NV1data = "Chuyên " + student.LOP_CHUYEN + ", môn " + student.MON_CHUYEN;
+                            }
+                            if (student.NV2 === null) student.NV2 = "";
+                            if (student.NV3 === null) student.NV3 = "";
+                            if (student.NV4 === null) student.NV4 = "";
+                            if (student.NV5 === null) student.NV5 = "";
+                            row.innerHTML = `
                     <td>${student.MA_HOC_SINH}</td>
                     <td class="text-start">${student.HO_TEN_HOC_SINH}</td>
                     <td>${student.GIOI_TINH}</td>
@@ -184,12 +197,14 @@
                         <a class="btn btn-danger" onclick="deleteStudent('${student.MA_HOC_SINH}')">Xóa hồ sơ</a>
                     </td>
                 `;
-                        tableBody.appendChild(row);
+                            tableBody.appendChild(row);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Có lỗi xảy ra khi tải danh sách học sinh:', error);
                     });
-                })
-                .catch(error => {
-                    console.error('Có lỗi xảy ra khi tải danh sách học sinh:', error);
-                });
+            }
+            window.onload = loadStudentList;
             function capTaiKhoanHocSinh() {
                 fetch("/thcs/account", {
                     method: "POST",

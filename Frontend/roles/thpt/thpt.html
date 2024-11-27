@@ -13,14 +13,27 @@
         <script>
             async function checkSession() {
                 try {
-                    const response = await fetch('/api/check-session'); // Endpoint kiểm tra session
+                    // Gọi API kiểm tra session
+                    const response = await fetch('/api/check-session');
                     if (!response.ok) {
-                        // Nếu không có session, chuyển hướng về trang chủ
-                        window.location.href = '/'; // Địa chỉ trang chủ
+                        throw new Error('Session không hợp lệ');
+                    }
+                    // Gọi API kiểm tra role
+                    const roleResponse = await fetch('/api/thpt');
+                    if (!roleResponse.ok) {
+                        throw new Error('Người dùng không có quyền truy cập');
+                    }
+                    const roleData = await roleResponse.json();
+                    // Hiển thị lời chào
+                    document.getElementById('greeting').innerText = 'Xin chào, ' + roleData.tenTruong.toUpperCase() + '!';
+                    // Kiểm tra đối tượng
+                    if (roleData.doiTuong !== 'thpt') {
+                        alert('Bạn không có quyền truy cập vào trang này!');
+                        window.location.href = '/'; // Chuyển hướng về trang chủ
                     }
                 } catch (error) {
-                    console.error('Lỗi khi kiểm tra session:', error);
-                    window.location.href = '/'; // Chuyển hướng nếu có lỗi
+                    console.error('Lỗi khi kiểm tra session hoặc quyền:', error);
+                    window.location.href = '/'; // Chuyển hướng nếu không hợp lệ
                 }
             }
             // Kiểm tra session khi trang được tải
@@ -69,7 +82,8 @@
                 <div class="display-6 fw-bold text-center content mt-2 mb-2">DANH SÁCH HỌC SINH ĐĂNG KÝ</div>
                 <div class="text-center">
                     <button class="btn btn-primary" id="updateStudentsButton">Cập nhật danh sách thí sinh</button>
-                    <button class="btn btn-info" id="update-sbd-button">Cập nhật số báo danh thí sinh</button>
+                    <button class="btn btn-info" id="update-sbd-button">Cập nhật số báo danh và phòng thi thí
+                        sinh</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="table absolute--fill text-center justify-center nowrap"
@@ -77,6 +91,8 @@
                         <thead>
                             <tr>
                                 <th>MSHS</th>
+                                <th>Số báo danh</th>
+                                <th>Phòng thi</th>
                                 <th>Họ và tên học sinh</th>
                                 <th>Giới tính</th>
                                 <th>Ngày sinh</th>
@@ -133,26 +149,29 @@
                         window.location.href = "/";
                     }
                 });
-            fetch('/thpt/hocsinh')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Lỗi khi lấy thông tin học sinh.');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    const tbody = document.getElementById('student-tbody');
-                    tbody.innerHTML = ''; // Xóa nội dung cũ
-
-                    data.forEach(student => {
-                        const row = document.createElement('tr');
-                        var ghichu = "";
-                        if (student.MA_THPT === "13") {
-                            ghichu = `Chuyên ${student.LOP_CHUYEN}, môn ${student.MON_CHUYEN}`;
+            function loadData() {
+                fetch('/thpt/hocsinh')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Lỗi khi lấy thông tin học sinh.');
                         }
-                        // Thêm các cột dữ liệu
-                        row.innerHTML = `
+                        return response.json();
+                    })
+                    .then(data => {
+                        const tbody = document.getElementById('student-tbody');
+                        tbody.innerHTML = ''; // Xóa nội dung cũ
+
+                        data.forEach(student => {
+                            const row = document.createElement('tr');
+                            var ghichu = "";
+                            if (student.MA_THPT === "13") {
+                                ghichu = `Chuyên ${student.LOP_CHUYEN}, môn ${student.MON_CHUYEN}`;
+                            }
+                            // Thêm các cột dữ liệu
+                            row.innerHTML = `
                         <td>${student.MA_HOC_SINH}</td>
+                        <td>${student.SO_BAO_DANH}</td>
+                        <td>${student.PHONG_THI}</td>
                         <td class="text-start">${student.HO_TEN_HOC_SINH}</td>
                         <td>${student.GIOI_TINH}</td>
                         <td>${new Date(student.NGAY_SINH).toLocaleDateString()}</td>
@@ -160,12 +179,14 @@
                         <td class="text-start">${ghichu}</td>
                         <td><a class="btn btn-success" href="chitiethosoTHPT.html?id=${student.MA_HOC_SINH}">Xem chi tiết</a></td>
                         `;
-                        tbody.appendChild(row);
+                            tbody.appendChild(row);
+                        });
+                    })
+                    .catch(error => {
+                        console.error(error);
                     });
-                })
-                .catch(error => {
-                    console.error(error);
-                });
+            }
+            window.onload = loadData;
             // Xử lý kiểm tra trước khi logout
             function confirmLogout(event) {
                 event.preventDefault(); // Ngăn chặn hành động mặc định của liên kết
@@ -189,6 +210,7 @@
                     })
                     .then(message => {
                         alert(message); // Hiển thị thông báo từ server
+                        loadData();
                     })
                     .catch(error => {
                         console.error(error);
@@ -210,7 +232,23 @@
                         throw new Error("Có lỗi xảy ra khi cập nhật số báo danh");
                     })
                     .then(message => {
-                        alert(message); // Hiển thị thông báo thành công từ server
+                        alert(message); // Hiển thị thông báo gán SBD thành công
+                        return fetch("/thpt/phongthi", {
+                            method: "PATCH",
+                            headers: {
+                                "Content-Type": "application/json"
+                            }
+                        });
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.text(); // Lấy thông báo phản hồi từ server
+                        }
+                        throw new Error("Có lỗi xảy ra khi cập nhật phòng thi");
+                    })
+                    .then(roomMessage => {
+                        alert(roomMessage); // Hiển thị thông báo gán phòng thi thành công
+                        loadData();
                     })
                     .catch(error => {
                         console.error(error);

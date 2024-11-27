@@ -158,7 +158,7 @@ app.get("/api/admin", (req, res) => {
       doiTuong: req.session.doiTuong,
     });
   } else {
-    res.send("Bạn không có quyền truy cập");
+    res.status(403).send("Bạn không có quyền truy cập");
   }
 });
 // Đổi mật khẩu của account Admin
@@ -214,7 +214,7 @@ app.get("/api/hdts", (req, res) => {
       doiTuong: req.session.doiTuong,
     });
   } else {
-    res.send("Bạn không có quyền truy cập");
+    res.status(403).send("Bạn không có quyền truy cập");
   }
 });
 app.get("/hdts/thisinh", (req, res) => {
@@ -334,7 +334,7 @@ app.get("/api/thcs", (req, res) => {
       maTruong: req.session.maTruong,
     });
   } else {
-    res.send("Bạn không có quyền truy cập");
+    res.status(403).send("Bạn không có quyền truy cập");
   }
 });
 app.put("/thcs", (req, res) => {
@@ -392,7 +392,7 @@ app.get("/api/thpt", (req, res) => {
       maTruong: req.session.maTruong,
     });
   } else {
-    res.send("Bạn không có quyền truy cập");
+    res.status(403).send("Bạn không có quyền truy cập");
   }
 });
 app.put("/thpt", (req, res) => {
@@ -436,11 +436,12 @@ app.put("/thpt", (req, res) => {
 app.get("/thpt/hocsinh", (req, res) => {
   const maTHPT = req.session.maTruong;
   db.query(
-    `SELECT NV.*, hoc_sinh.HO_TEN_HOC_SINH, hoc_sinh.GIOI_TINH, hoc_sinh.NGAY_SINH, TEN_THCS FROM nguyen_vong NV
+    `SELECT NV.*, hoc_sinh.HO_TEN_HOC_SINH, hoc_sinh.GIOI_TINH, hoc_sinh.NGAY_SINH, TEN_THCS, thi_sinh.* FROM nguyen_vong NV
     JOIN (SELECT MA_HOC_SINH, MIN(THU_TU) AS NVMAX FROM nguyen_vong GROUP BY MA_HOC_SINH) AS NVCN 
     ON NV.MA_HOC_SINH = NVCN.MA_HOC_SINH AND NV.THU_TU = NVCN.NVMAX 
     JOIN hoc_sinh ON NV.MA_HOC_SINH = hoc_sinh.MA_HOC_SINH 
-    JOIN TRUONG_THCS ON hoc_sinh.MA_THCS = TRUONG_THCS.MA_THCS WHERE MA_THPT = ?
+    JOIN TRUONG_THCS ON hoc_sinh.MA_THCS = TRUONG_THCS.MA_THCS
+    JOIN THI_SINH ON hoc_sinh.MA_HOC_SINH = thi_sinh.MA_HOC_SINH WHERE thi_sinh.MA_THPT = ?
     ORDER BY SUBSTRING_INDEX(hoc_sinh.HO_TEN_HOC_SINH, ' ', -1), HO_TEN_HOC_SINH, NGAY_SINH`,
     [maTHPT],
     (err, results) => {
@@ -502,9 +503,9 @@ app.post("/thpt/thisinh", (req, res) => {
     }
   );
 });
+// Cập nhật số báo danh của thí sinh
 app.patch("/thpt/sbd", async (req, res) => {
   const maTHPT = req.session.maTruong;
-
   try {
     // Bước 1: Xóa số báo danh hiện có cho tất cả các thí sinh của trường
     await db
@@ -512,7 +513,6 @@ app.patch("/thpt/sbd", async (req, res) => {
       .query("UPDATE thi_sinh SET SO_BAO_DANH = NULL WHERE MA_THPT = ?", [
         maTHPT,
       ]);
-
     // Bước 2: Lấy danh sách thí sinh sắp xếp theo tên (dựa trên tên cuối cùng trong họ tên)
     const [students] = await db.promise().query(
       `SELECT hoc_sinh.MA_HOC_SINH, hoc_sinh.HO_TEN_HOC_SINH 
@@ -522,13 +522,11 @@ app.patch("/thpt/sbd", async (req, res) => {
        ORDER BY SUBSTRING_INDEX(hoc_sinh.HO_TEN_HOC_SINH, ' ', -1), hoc_sinh.HO_TEN_HOC_SINH`,
       [maTHPT]
     );
-
     // Bước 3: Đánh số báo danh theo quy tắc
     const soBaoDanhList = students.map((student, index) => {
       const soBaoDanh = `${maTHPT}${String(index + 1).padStart(4, "0")}`;
       return [soBaoDanh, student.MA_HOC_SINH];
     });
-
     // Bước 4: Cập nhật số báo danh vào bảng thi_sinh
     await Promise.all(
       soBaoDanhList.map(([soBaoDanh, maHocSinh]) =>
@@ -540,7 +538,6 @@ app.patch("/thpt/sbd", async (req, res) => {
           )
       )
     );
-
     res.send("Cập nhật số báo danh thành công cho các thí sinh!");
   } catch (error) {
     console.error(error);
@@ -549,7 +546,45 @@ app.patch("/thpt/sbd", async (req, res) => {
       .send("Có lỗi xảy ra khi cập nhật số báo danh cho thí sinh.");
   }
 });
-
+// Cập nhật danh sách phòng thi của thí sinh
+app.patch("/thpt/phongthi", async (req, res) => {
+  const maTHPT = req.session.maTruong;
+  try {
+    // Bước 1: Lấy danh sách thí sinh đã được cấp số báo danh, sắp xếp theo số báo danh
+    const [students] = await db.promise().query(
+      `SELECT MA_HOC_SINH, SO_BAO_DANH 
+       FROM thi_sinh 
+       WHERE MA_THPT = ? 
+       ORDER BY SO_BAO_DANH`,
+      [maTHPT]
+    );
+    if (students.length === 0) {
+      return res.status(404).send("Không tìm thấy thí sinh nào để xếp phòng.");
+    }
+    // Bước 2: Gán phòng thi dựa trên nhóm 24 thí sinh
+    const roomAssignments = students.map((student, index) => {
+      const roomNumber = Math.floor(index / 24) + 1; // Đánh số phòng từ 1
+      return [roomNumber, student.MA_HOC_SINH];
+    });
+    // Bước 3: Cập nhật phòng thi vào bảng thi_sinh
+    await Promise.all(
+      roomAssignments.map(([roomNumber, maHocSinh]) =>
+        db
+          .promise()
+          .query(
+            "UPDATE thi_sinh SET PHONG_THI = ? WHERE MA_HOC_SINH = ? AND MA_THPT = ?",
+            [roomNumber, maHocSinh, maTHPT]
+          )
+      )
+    );
+    res.send("Cập nhật phòng thi thành công cho các thí sinh!");
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .send("Có lỗi xảy ra khi cập nhật phòng thi cho các thí sinh.");
+  }
+});
 // Xử lý đăng nhập của học sinh
 app.get("/hocsinh", (req, res) => {
   if (req.session.tenTaiKhoan && req.session.doiTuong === "hocsinh") {
